@@ -49,13 +49,15 @@ Parameter | Description | Default
 `receiverPath` | Path to the traffic receiver Python script | /usr/bin/traffic_receiver.py
 `tcpReceiverPath` | Path to the TCP traffic receiver Python script | /usr/bin/traffic_receiver_tcp.py
 `udpReceiverPath` | Path to the UDP traffic receiver Python script | /usr/bin/traffic_receiver_udp.py
+`iperfPath` | Path to the iPerf executable | /usr/bin/iperf
+`cmdOptions.useIperf` | use iPerf network stresser | False
 `cmdOptions.tcpPort` | TCP port of the server | 80
 `cmdOptions.udpPort` | UDP port of the server | 8080
 `cmdOptions.udpPercentage` | The percentage of the flows to be created over UDP (0 to 100) | 50
 `cmdOptions.minBytes` | Minimum number of bytes to send in a flow | 100
 `cmdOptions.maxBytes` | Maximum number of bytes to send in a flow | 1000
 `cmdOptions.udpBuffer` | UDP buffer size (in bytes) | 2000
-`cmdOptions.numOfFlows` | Minimum number of flows to generate | 20
+`cmdOptions.numOfFlows` | Minimum number of flows to generate *(N/A for iPerf)  | 20
 `cmdOptions.time` | Minimum length of time to generate traffic (in minutes) | 1
 `cmdOptions.delay` | Delay between flows (in milliseconds) | 500
 `cmdOptions.silent` | Suppress output | False

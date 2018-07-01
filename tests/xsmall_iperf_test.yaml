@@ -1,24 +1,25 @@
-imagePath: "cognetive/network_stresser:0.0.2"
-imagePullPolicy: IfNotPresent
+imagePullPolicy: Always
+imagePath: test:test
 serviceName: receiver
-receiverReplicas: 2
-generatorReplicas: 3
+receiverReplicas: 1
+generatorReplicas: 1
 imageConfig:
+  iperfPath: /usr/bin/iperf
   pythonPath: /usr/bin/python2.7
   generatorPath: /usr/bin/traffic_generator.py
   receiverPath: /usr/bin/traffic_receiver.py
   tcpReceiverPath: /usr/bin/traffic_receiver_tcp.py
   udpReceiverPath: /usr/bin/traffic_receiver_udp.py
 cmdOptions:
-  useIperf: False
+  useIperf: True
   tcpPort: 80
   udpPort: 8080
-  udpPercentage: 50
+  udpPercentage: 0
   minBytes: 100
-  maxBytes: 1000
-  udpBuffer: 2000
-  numOfFlows: 20
-  time: 5
-  delay: 50
+  maxBytes: 100
+  udpBuffer: 1000
+  numOfFlows: 10
+  time: 2
+  delay: 1
   silent: False
   

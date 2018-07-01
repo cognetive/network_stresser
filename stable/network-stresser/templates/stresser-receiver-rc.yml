@@ -38,6 +38,8 @@ spec:
         - -u
         - {{ .Values.imageConfig.receiverPath }}
         - --python_bin={{ .Values.imageConfig.pythonPath }}
+        - --iperf_bin={{ .Values.imageConfig.iperfPath }}
+        - --use_iperf={{ .Values.cmdOptions.useIperf }}
         - --tcp_receiver={{ .Values.imageConfig.tcpReceiverPath }}
         - --udp_receiver={{ .Values.imageConfig.udpReceiverPath }}
         - --tcp_port={{ .Values.cmdOptions.tcpPort }}

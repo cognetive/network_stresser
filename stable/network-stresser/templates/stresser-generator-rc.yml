@@ -35,6 +35,8 @@ spec:
         - -u
         - {{ .Values.imageConfig.generatorPath }}
         - --server={{ .Values.serviceName }}
+        - --iperf_bin={{ .Values.imageConfig.iperfPath }}
+        - --use_iperf={{ .Values.cmdOptions.useIperf }}
         - --tcp_port={{ .Values.cmdOptions.tcpPort }}
         - --udp_port={{ .Values.cmdOptions.udpPort }}
         - --udp_percentage={{ .Values.cmdOptions.udpPercentage }}

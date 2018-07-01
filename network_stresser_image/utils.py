@@ -1,6 +1,7 @@
 import sys, traceback
 from datetime import datetime
 
+USE_IPERF = False
 TCP_PORT = 80
 UDP_PORT = 8080
 ALL_IPS = "0.0.0.0"
@@ -10,6 +11,7 @@ MAX_BYTES = 1000
 BUFF_SIZE = 2000
 NUM_OF_FLOWS = 1000
 DELAY = 1000 # in milliseconds
+IPERF_PATH = "/usr/bin/iperf"
 PYTHON_PATH = "/usr/bin/python2.7"
 
 def log_receive(protocol, bytes):

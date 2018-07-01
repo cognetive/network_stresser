@@ -6,10 +6,11 @@ import argparse
 from time import sleep
 from utils import *
 from datetime import datetime, timedelta
+from os import system
 
 
 class trafficGenerator(object):
-    def __init__(self, server, tcp_port, udp_port, max_bytes):
+    def __init__(self, server, iperf, tcp_port, udp_port, max_bytes):
         """
         Initialize a traffic generator
         @param server: IP address of the server
@@ -18,6 +19,7 @@ class trafficGenerator(object):
         @param max_bytes: Maximum number of bytes to be sent by the generator
         """
         self.server = server
+        self.iperf = iperf
         self.tcp_port = tcp_port
         self.udp_port = udp_port
         self.max_bytes = max_bytes
@@ -85,13 +87,47 @@ class trafficGenerator(object):
         sock.sendto(data, (self.server, port))
         sock.close()
 
+    def request_iperf_tcp(self, amount, counter, silent):
+        """
+        Send an iPerf TCP request of the given amount to the server
+        @param amount: The amount of data to be sent
+        @param counter: The index of the current request in the test
+        @param silent: Should logging output be suppressed
+        """
+        dots, data = self.get_data(amount)
+        port = self.tcp_port
+        iperf = self.iperf
+        server = self.server
+        protocol = "IPERF TCP"
+        timestamp = now()
+        if not silent: print self.send_message.format(**locals()) + "\n"
+
+        system("{iperf} -c {server} -p {port}".format(**locals()))
+
+    def request_iperf_udp(self, amount, counter, silent):
+        """
+        Send an iPerf UDP request of the given amount to the server
+        @param amount: The amount of data to be sent
+        @param counter: The index of the current request in the test
+        @param silent: Should logging output be suppressed
+        """
+        dots, data = self.get_data(amount)
+        port = self.tcp_port
+        iperf = self.iperf
+        server = self.server
+        protocol = "IPERF UDP"
+        timestamp = now()
+        if not silent: print self.send_message.format(**locals()) + "\n"
+
+        system("{iperf} -c {server} -u -p {port}".format(**locals()))
+        
 
 def main():
     """
     Generate network traffic based on user specified parameters
     """
     args = parser.parse_args()
-    generator = trafficGenerator(args.server, args.tcp_port, args.udp_port, args.max_bytes)
+    generator = trafficGenerator(args.server, args.iperf_bin, args.tcp_port, args.udp_port, args.max_bytes )
     deadline = datetime.now()+timedelta(minutes=args.time)
     flows_counter = 0
     start_time = datetime.now()
@@ -100,11 +136,15 @@ def main():
           (now(), args.time, args.num_of_flows, args.delay)
     try:
         while datetime.now() < deadline or flows_counter < args.num_of_flows:
-            flows_counter += 1
             amount = random.randint(args.min_bytes, args.max_bytes)
-            request_func =\
-                generator.request_udp if (random.randint(1, 100) <= args.udp_percentage) else generator.request_tcp
-            request_func(amount, flows_counter, args.silent)
+            if args.use_iperf:
+                request_func =\
+                    generator.request_iperf_udp if (random.randint(1, 100) <= args.udp_percentage) else generator.request_iperf_tcp
+            else:
+                flows_counter += 1
+                request_func =\
+                    generator.request_udp if (random.randint(1, 100) <= args.udp_percentage) else generator.request_tcp
+            request_func(amount, flows_counter, args.silent)           
             sleep(args.delay/1000.0)
 
     except KeyboardInterrupt:
@@ -119,6 +159,10 @@ def main():
 parser = argparse.ArgumentParser(description='Generate network traffic as a stress test.')
 parser.add_argument('--server', nargs='?', default=LOCALHOST,
                     help='IP address of the server')
+parser.add_argument('--iperf_bin', nargs='?', default=IPERF_PATH, type=str,
+                    help='location of iperf')
+parser.add_argument('--use_iperf', nargs='?', default=USE_IPERF, type=str2bool,
+                    help='Use Iperf stresser')
 parser.add_argument('--tcp_port', nargs='?', default=TCP_PORT, type=int,
                     help='TCP port of the server')
 parser.add_argument('--udp_port', nargs='?', default=UDP_PORT, type=int,
