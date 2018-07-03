@@ -90,26 +90,13 @@ class trafficGenerator(object):
         sock.sendto(data, (self.server, port))
         sock.close()
 
-    def request_iperf_tcp(self, amount, counter, silent):
-        """
-        Send an iPerf TCP request of the given amount to the server
-        @param amount: The amount of data to be sent
-        @param counter: The index of the current request in the test
-        @param silent: Should logging output be suppressed
-        """
-        dots, data = self.get_data(amount)
-        port = self.tcp_port
-        iperf = self.iperf
-        server = self.server
-        iperf_threads = self.iperf_threads
-        iperf_bandwidth = "N/A"
-        protocol = "IPERF TCP"
-        timestamp = now()
-        if not silent: print self.send_iperf_message.format(**locals()) + "\n"
-
-        system("{iperf} -c {server} -p {port} -P {iperf_threads}".format(**locals()))
-
     def request_iperf_udp(self, amount, counter, silent):
+        self.request_iperf("IPERF UDP", self.udp_port, amount, counter, silent, "-u")
+        
+    def request_iperf_tcp(self, amount, counter, silent):
+        self.request_iperf("IPERF TCP", self.tcp_port, amount, counter, silent, "")
+
+    def request_iperf(self, protocol, port, amount, counter, silent, extraflags):
         """
         Send an iPerf UDP request of the given amount to the server
         @param amount: The amount of data to be sent
@@ -117,16 +104,14 @@ class trafficGenerator(object):
         @param silent: Should logging output be suppressed
         """
         dots, data = self.get_data(amount)
-        port = self.udp_port
         iperf = self.iperf
         server = self.server
         iperf_threads = self.iperf_threads
         iperf_bandwidth = self.iperf_bandwidth
-        protocol = "IPERF UDP"
         timestamp = now()
         if not silent: print self.send_iperf_message.format(**locals()) + "\n"
 
-        system("{iperf} -c {server} -u -p {port} -b {iperf_bandwidth} -P {iperf_threads}".format(**locals()))
+        system("{iperf} -c {server} {extraflags} -p {port} -b {iperf_bandwidth} -P {iperf_threads}".format(**locals()))
         
 
 def main():
