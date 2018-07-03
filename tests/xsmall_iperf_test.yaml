@@ -1,5 +1,4 @@
 imagePullPolicy: Always
-imagePath: test:test
 serviceName: receiver
 receiverReplicas: 1
 generatorReplicas: 1
