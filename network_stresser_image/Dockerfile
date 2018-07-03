@@ -21,4 +21,6 @@ RUN chmod 777 /usr/bin/traffic_receiver_udp.py
 RUN apt-get update -y
 RUN apt-get upgrade -y
 RUN apt-get install -y python2.7
+RUN apt-get install -y iperf
+
 
