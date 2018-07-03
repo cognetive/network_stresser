@@ -2,6 +2,8 @@ import sys, traceback
 from datetime import datetime
 
 USE_IPERF = False
+IPERF_BANDWIDTH = "100m"
+IPERF_THREADS = 1
 TCP_PORT = 80
 UDP_PORT = 8080
 ALL_IPS = "0.0.0.0"

@@ -42,8 +42,8 @@ Parameter | Description | Default
 `imagePath` | Path to the Docker image | cognetive/network_stresser:0.0.2
 `imagePullPolicy` | Whether to Always pull imaged or only IfNotPresent | IfNotPresent
 `serviceName` | The name of the receiver's service | receiver
-`receiverReplicas` | How many instances if the receiver to create | 2
-`generatorReplicas` | How many instances if the generator to create | 3
+`receiverReplicas` | How many instances if the receiver to create | 1
+`generatorReplicas` | How many instances if the generator to create | 1
 `pythonPath` | Path to the Python 2.7 binary | /usr/bin/python2.7
 `generatorPath` | Path to the traffic generator Python script | /usr/bin/traffic_generator.py
 `receiverPath` | Path to the traffic receiver Python script | /usr/bin/traffic_receiver.py
@@ -51,8 +51,10 @@ Parameter | Description | Default
 `udpReceiverPath` | Path to the UDP traffic receiver Python script | /usr/bin/traffic_receiver_udp.py
 `iperfPath` | Path to the iPerf executable | /usr/bin/iperf
 `cmdOptions.useIperf` | use iPerf network stresser | False
-`cmdOptions.tcpPort` | TCP port of the server | 80
-`cmdOptions.udpPort` | UDP port of the server | 8080
+`cmdOptions.iperfBandwidth` | iPerf udp bandwidth (100%=unlimited) | 100m
+`cmdOptions.iperfThreads` | Number of iperf threads | 1
+`cmdOptions.tcpPort` | TCP port of the server | 8080
+`cmdOptions.udpPort` | UDP port of the server | 8081
 `cmdOptions.udpPercentage` | The percentage of the flows to be created over UDP (0 to 100) | 50
 `cmdOptions.minBytes` | Minimum number of bytes to send in a flow | 100
 `cmdOptions.maxBytes` | Maximum number of bytes to send in a flow | 1000

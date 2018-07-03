@@ -12,12 +12,14 @@ imageConfig:
   udpReceiverPath: /usr/bin/traffic_receiver_udp.py
 cmdOptions:
   useIperf: True
-  tcpPort: 80
-  udpPort: 8080
-  udpPercentage: 0
-  minBytes: 100
-  maxBytes: 100
-  udpBuffer: 1000
+  iperfBandwidth: 100m
+  iperfThreads: 1
+  tcpPort: 8080
+  udpPort: 8081
+  udpPercentage: 100
+  minBytes: 0
+  maxBytes: 0
+  udpBuffer: 0
   numOfFlows: 10
   time: 2
   delay: 1

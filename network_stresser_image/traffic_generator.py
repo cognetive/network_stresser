@@ -10,7 +10,7 @@ from os import system
 
 
 class trafficGenerator(object):
-    def __init__(self, server, iperf, tcp_port, udp_port, max_bytes):
+    def __init__(self, server, iperf, iperf_bandwidth, iperf_threads, tcp_port, udp_port, max_bytes):
         """
         Initialize a traffic generator
         @param server: IP address of the server
@@ -20,11 +20,14 @@ class trafficGenerator(object):
         """
         self.server = server
         self.iperf = iperf
+        self.iperf_bandwidth = iperf_bandwidth
+        self.iperf_threads = iperf_threads
         self.tcp_port = tcp_port
         self.udp_port = udp_port
         self.max_bytes = max_bytes
-        self.send_message = "{counter} {timestamp}\t\t\t {protocol} sending  {amount:05} bytes to {port:04}\t{dots}"
-        self.receive_message = "{counter} {timestamp}\t {r.status} {r.reason} \t received {r_len:05} bytes from {src_port}\n"
+        self.send_message = "{counter} {timestamp}\t\t\t {protocol} sending  {amount:05} bytes to port {port:04}\t{dots}"
+        self.send_iperf_message = "{counter} {timestamp}\t\t\t {protocol} bandwidth {iperf_bandwidth} threads {iperf_threads} to port {port:04}"
+        self.receive_message = "{counter} {timestamp}\t {r.status} {r.reason} \t received {r_len:05} bytes from port {src_port}\n"
 
     def get_data(self, amount):
         """
@@ -98,11 +101,13 @@ class trafficGenerator(object):
         port = self.tcp_port
         iperf = self.iperf
         server = self.server
+        iperf_threads = self.iperf_threads
+        iperf_bandwidth = "N/A"
         protocol = "IPERF TCP"
         timestamp = now()
-        if not silent: print self.send_message.format(**locals()) + "\n"
+        if not silent: print self.send_iperf_message.format(**locals()) + "\n"
 
-        system("{iperf} -c {server} -p {port}".format(**locals()))
+        system("{iperf} -c {server} -p {port} -P {iperf_threads}".format(**locals()))
 
     def request_iperf_udp(self, amount, counter, silent):
         """
@@ -112,14 +117,16 @@ class trafficGenerator(object):
         @param silent: Should logging output be suppressed
         """
         dots, data = self.get_data(amount)
-        port = self.tcp_port
+        port = self.udp_port
         iperf = self.iperf
         server = self.server
+        iperf_threads = self.iperf_threads
+        iperf_bandwidth = self.iperf_bandwidth
         protocol = "IPERF UDP"
         timestamp = now()
-        if not silent: print self.send_message.format(**locals()) + "\n"
+        if not silent: print self.send_iperf_message.format(**locals()) + "\n"
 
-        system("{iperf} -c {server} -u -p {port}".format(**locals()))
+        system("{iperf} -c {server} -u -p {port} -b {iperf_bandwidth} -P {iperf_threads}".format(**locals()))
         
 
 def main():
@@ -127,7 +134,7 @@ def main():
     Generate network traffic based on user specified parameters
     """
     args = parser.parse_args()
-    generator = trafficGenerator(args.server, args.iperf_bin, args.tcp_port, args.udp_port, args.max_bytes )
+    generator = trafficGenerator(args.server, args.iperf_bin, args.iperf_bandwidth, args.iperf_threads, args.tcp_port, args.udp_port, args.max_bytes )
     deadline = datetime.now()+timedelta(minutes=args.time)
     flows_counter = 0
     start_time = datetime.now()
@@ -163,6 +170,10 @@ parser.add_argument('--iperf_bin', nargs='?', default=IPERF_PATH, type=str,
                     help='location of iperf')
 parser.add_argument('--use_iperf', nargs='?', default=USE_IPERF, type=str2bool,
                     help='Use Iperf stresser')
+parser.add_argument('--iperf_bandwidth', nargs='?', default=IPERF_BANDWIDTH, type=str,
+                    help='iPerf bandwidth (0=unlimited)')
+parser.add_argument('--iperf_threads', nargs='?', default=IPERF_THREADS, type=int,
+                    help='Number of iperf threads')
 parser.add_argument('--tcp_port', nargs='?', default=TCP_PORT, type=int,
                     help='TCP port of the server')
 parser.add_argument('--udp_port', nargs='?', default=UDP_PORT, type=int,
