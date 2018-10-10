@@ -13,8 +13,8 @@ cmdOptions:
   useIperf: True
   tcpPort: 8081
   udpPort: 8082
-  iperfBandwidth: 1M
-  iperfThreads: 1
+  iperfBandwidth: 1G
+  iperfThreads: 4
   udpPercentage: 0
   minBytes: 100
   maxBytes: 500
