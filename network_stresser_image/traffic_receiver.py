@@ -15,7 +15,7 @@ def run(python, iperf, tcp_receiver, udp_receiver, use_iperf, tcp_port, udp_port
     """
     if use_iperf:
         system("{iperf} -s -p {tcp_port} &".format(**locals()))
-        system("{iperf} -s -u -p {udp_port} &".format(**locals()))
+        system("{iperf} -s -p {udp_port}".format(**locals()))
     else:
         system("{python} {tcp_receiver} --port={tcp_port} --silent={silent} &".format(**locals()))
         system("{python} {udp_receiver} --port={udp_port} --buffer_size={buff_size} --silent={silent}".format(**locals()))

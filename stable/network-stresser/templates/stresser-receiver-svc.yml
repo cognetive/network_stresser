@@ -11,7 +11,11 @@ spec:
     protocol: TCP
     port: {{ .Values.cmdOptions.tcpPort }}
     targetPort: {{ .Values.cmdOptions.tcpPort }}
-  - name: udp-receiver
+  - name: udp-receiver-tcp
+    protocol: TCP
+    port: {{ .Values.cmdOptions.udpPort }}
+    targetPort: {{ .Values.cmdOptions.udpPort }}
+  - name: udp-receiver-udp
     protocol: UDP
     port: {{ .Values.cmdOptions.udpPort }}
     targetPort: {{ .Values.cmdOptions.udpPort }}

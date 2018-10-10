@@ -1,5 +1,5 @@
-imagePath: "cognetive/network_stresser:0.0.3"
-imagePullPolicy: IfNotPresent
+imagePath: "cognetive/network_stresser:0.0.4"
+imagePullPolicy: Always
 serviceName: receiver
 receiverReplicas: 1
 generatorReplicas: 1
@@ -10,7 +10,7 @@ imageConfig:
   tcpReceiverPath: /usr/bin/traffic_receiver_tcp.py
   udpReceiverPath: /usr/bin/traffic_receiver_udp.py
 cmdOptions:
-  useIperf: False
+  useIperf: True
   iperfBandwidth: 100m
   iperfThreads: 1
   tcpPort: 8080

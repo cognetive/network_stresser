@@ -78,8 +78,9 @@ get_value() {
 get_values() {
     runtime=$(bc <<< "$(get_value time) * 60")
     num_of_flows=$(get_value numOfFlows)
+    iperf_bw=$(get_value iperfBandwidth)
     delay=$(get_value delay)
-    builtin echo "min_runtime:${runtime}s, min_flows_per_generator:${num_of_flows}, delay:${delay}ms"
+    builtin echo "min_runtime:${runtime}s, iperf_bw:${iperf_bw}, min_flows_per_generator:${num_of_flows}, delay:${delay}ms"
 }
 
 #=== FUNCTION ==================================================================
