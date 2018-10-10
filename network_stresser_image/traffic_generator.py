@@ -122,6 +122,7 @@ def main():
     generator = trafficGenerator(args.server, args.iperf_bin, args.iperf_bandwidth, args.iperf_threads, args.tcp_port, args.udp_port, args.max_bytes )
     deadline = datetime.now()+timedelta(minutes=args.time)
     flows_counter = 0
+    sleep(5)
     start_time = datetime.now()
 
     print "%s\tTEST STARTING: max_desired_runtime=%.3fm, desired_flows=%d, delay=%dms" %\
