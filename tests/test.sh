@@ -1,3 +1,5 @@
+#!/bin/bash
+
 if [[ debug == "$1" ]]; then
   INSTRUMENTING=yes
   shift
@@ -243,4 +245,4 @@ save_receivers_logs
 remove_helm ${RELEASE}
 
 
-builtin echo "done"
+builtin echo -e "done\n"
