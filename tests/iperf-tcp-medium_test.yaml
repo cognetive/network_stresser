@@ -20,7 +20,7 @@ cmdOptions:
   maxBytes: 500
   udpBuffer: 1000
   numOfFlows: 500
-  time: 3
+  time: 5
   delay: 50
   silent: False
   
