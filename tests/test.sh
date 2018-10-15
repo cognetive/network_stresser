@@ -17,7 +17,8 @@ CPU_ID=4 # Location of CPU usage value in kubectl top's output
 RAM_ID=5 # Location of RAM usage value in kubectl top's output
 
 TEST_NAME=$1
-RELEASE=network-stresser-test-${TEST_NAME}
+SPECIFIC_TEST_NAME=$(cut -d "/" -f 2 <<< ${TEST_NAME})
+RELEASE=network-stresser-test-${SPECIFIC_TEST_NAME}
 VALUES=${TEST_NAME}_test.yaml
 DEFAULT_NAMESPACE=default
 REFRESH_RATE=5s
@@ -224,6 +225,12 @@ where <test_name> matches a <test_name>_test.yaml file in the tests directory. Y
     exit
 fi
 
+# Set "CONF_FILE" to a specific file, if found at test conf file
+conf_file_name=$(get_value confFile)
+if [ -n "$conf_file_name" ]; then
+    CONF_FILE=$conf_file_name
+fi
+echo "CONF_FILE name is: ${CONF_FILE}"
 
 # Clear the cluster from previous tests
 clear_prev_tests
@@ -236,6 +243,7 @@ log "TEST_STARTING, $(get_values)"
 install_helm
 SECONDS=0
 # Wait for the test to complete
+sleep 120 # Wait for 2 minutes in order to give enough time to heapster pod to gather relevant stats
 wait_for_completion
 # Log the final statistics and receivers' output
 total_runtime=$SECONDS
