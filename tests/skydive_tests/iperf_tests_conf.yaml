@@ -1,0 +1,10 @@
+startStr: "iperf"
+endStr: "_test.yaml"
+testFileNamePrefix: "skydive_tests/"
+scriptName: "/test.sh"
+skydiveHelmChartName: "skydive"
+skydiveHelmChartPath: "ibm-charts/ibm-skydive-dev"
+defaultNamespace: "default"
+logFileName: "iperf_tests.log"
+envVariableName: "SKYDIVE_ANALYZER_STARTUP_CAPTURE_GREMLIN"
+runForever: True

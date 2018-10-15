@@ -2,18 +2,24 @@ import os
 import subprocess
 from time import sleep
 import logging
+import yaml
+
+conf_vars = yaml.load(open('iperf_tests_conf.yaml'))
 
 # Global variables
-START_STR = "iperf"
-END_STR = "_test.yaml"
-TEST_FILE_NAME_PREFIX = "skydive_tests/"
+START_STR = conf_vars.get('startStr', "iperf")
+END_STR = conf_vars.get('endStr', "_test.yaml")
+TEST_FILE_NAME_PREFIX = conf_vars.get('testFileNamePrefix', "skydive_tests/")
+SCRIPT_NAME = conf_vars.get('scriptName', "/test.sh")
+SKYDIVE_HELM_CHART_NAME = conf_vars.get('skydiveHelmChartName', "skydive")
+SKYDIVE_HELM_CHART_PATH = conf_vars.get('skydiveHelmChartPath', "ibm-charts/ibm-skydive-dev")
+DEFAULT_NAMESPACE = conf_vars.get('defaultNamespace', "default")
+LOG_FILE_NAME = conf_vars.get('logFileName', "iperf_tests.log")
+ENV_VARIABLE_NAME = conf_vars.get('envVariableName', "SKYDIVE_ANALYZER_STARTUP_CAPTURE_GREMLIN")
+RUN_FOREVER = conf_vars.get('runForever', True)
+
 SCRIPT_PATH = os.path.normpath(os.path.dirname(os.path.abspath(__file__)) + os.sep + os.pardir)
-SCRIPT_NAME = "/test.sh"
-SKYDIVE_HELM_CHART_NAME = "skydive"
-SKYDIVE_HELM_CHART_PATH = "ibm-charts/ibm-skydive-dev"
-DEFAULT_NAMESPACE = "default"
-LOG_FILE_NAME = "iperf_tests.log"
-ENV_VARIABLE_NAME = "SKYDIVE_ANALYZER_STARTUP_CAPTURE_GREMLIN"
+
 
 # Set up logging to file
 logging.basicConfig(level=logging.DEBUG,
@@ -80,19 +86,21 @@ if __name__ == "__main__":
     skydive_charts_config_dict["Monitor_all_except_loopbacks"] = "G.V().has(\'Name\'\,NE(\'lo\'))"
 
     clean_existed_skydive_helm_chart()
-    for env_variable_meaning, env_variable_value in skydive_charts_config_dict.iteritems():
-        test_file_number = 0  # type: int
-        install_skydive_helm_chart(env_variable_meaning, env_variable_value)
 
-        # Run all test files for the current installed SkyDive chart
-        for filename in os.listdir(os.path.dirname(os.path.abspath(__file__))):
-            if filename.endswith(END_STR) and filename.startswith(START_STR):
-                test_file_number += 1
-                filename = TEST_FILE_NAME_PREFIX + filename
-                logging.info("Starting to check test file #{}: \"{}\".".format(test_file_number, filename[:-10]))
-                default_working_dir = os.getcwd()  # type: str
-                os.chdir(SCRIPT_PATH)
-                subprocess.call("{} {}".format(SCRIPT_PATH + SCRIPT_NAME, filename[:-10]), shell=True)
-                os.chdir(default_working_dir)
+    while RUN_FOREVER:
+        for env_variable_meaning, env_variable_value in skydive_charts_config_dict.iteritems():
+            test_file_number = 0  # type: int
+            install_skydive_helm_chart(env_variable_meaning, env_variable_value)
 
-        clean_existed_skydive_helm_chart()
+            # Run all test files for the current installed SkyDive chart
+            for filename in os.listdir(os.path.dirname(os.path.abspath(__file__))):
+                if filename.endswith(END_STR) and filename.startswith(START_STR):
+                    test_file_number += 1
+                    filename = TEST_FILE_NAME_PREFIX + filename
+                    logging.info("Starting to check test file #{}: \"{}\".".format(test_file_number, filename[:-10]))
+                    default_working_dir = os.getcwd()  # type: str
+                    os.chdir(SCRIPT_PATH)
+                    subprocess.call("{} {}".format(SCRIPT_PATH + SCRIPT_NAME, filename[:-10]), shell=True)
+                    os.chdir(default_working_dir)
+
+            clean_existed_skydive_helm_chart()
