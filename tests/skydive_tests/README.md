@@ -6,6 +6,7 @@ This folder holds specific Skydive test stress code
 
 apt-get install python
 apt-get install pip
+apt-get install bc
 pip install pyyaml
 
 HELM_GET=https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get
