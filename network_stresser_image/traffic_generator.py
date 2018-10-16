@@ -122,12 +122,13 @@ def main():
     generator = trafficGenerator(args.server, args.iperf_bin, args.iperf_bandwidth, args.iperf_threads, args.tcp_port, args.udp_port, args.max_bytes )
     deadline = datetime.now()+timedelta(minutes=args.time)
     flows_counter = 0
+    sleep(5)
     start_time = datetime.now()
 
-    print "%s\tTEST STARTING: min_runtime=%.3fm min_flows=%d delay=%dms" %\
+    print "%s\tTEST STARTING: max_desired_runtime=%.3fm, desired_flows=%d, delay=%dms" %\
           (now(), args.time, args.num_of_flows, args.delay)
     try:
-        while datetime.now() < deadline or flows_counter < args.num_of_flows:
+        while datetime.now() < deadline and flows_counter < args.num_of_flows:
             amount = random.randint(args.min_bytes, args.max_bytes)
             if args.use_iperf:
                 request_func =\

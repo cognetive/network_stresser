@@ -39,7 +39,7 @@ The following table lists the configurable parameters of the chart and their def
 
 Parameter | Description | Default
 --------- | ----------- | -------
-`imagePath` | Path to the Docker image | cognetive/network_stresser:0.0.2
+`imagePath` | Path to the Docker image | cognetive/network_stresser:0.0.4
 `imagePullPolicy` | Whether to Always pull imaged or only IfNotPresent | IfNotPresent
 `serviceName` | The name of the receiver's service | receiver
 `receiverReplicas` | How many instances if the receiver to create | 1
@@ -49,12 +49,12 @@ Parameter | Description | Default
 `receiverPath` | Path to the traffic receiver Python script | /usr/bin/traffic_receiver.py
 `tcpReceiverPath` | Path to the TCP traffic receiver Python script | /usr/bin/traffic_receiver_tcp.py
 `udpReceiverPath` | Path to the UDP traffic receiver Python script | /usr/bin/traffic_receiver_udp.py
-`iperfPath` | Path to the iPerf executable | /usr/bin/iperf
+`iperfPath` | Path to the iPerf executable | /usr/bin/iperf3
 `cmdOptions.useIperf` | use iPerf network stresser | False
 `cmdOptions.iperfBandwidth` | iPerf udp bandwidth (100%=unlimited) | 100m
 `cmdOptions.iperfThreads` | Number of iperf threads | 1
-`cmdOptions.tcpPort` | TCP port of the server | 8080
-`cmdOptions.udpPort` | UDP port of the server | 8081
+`cmdOptions.tcpPort` | TCP port of the server | 8081
+`cmdOptions.udpPort` | UDP port of the server | 8082
 `cmdOptions.udpPercentage` | The percentage of the flows to be created over UDP (0 to 100) | 50
 `cmdOptions.minBytes` | Minimum number of bytes to send in a flow | 100
 `cmdOptions.maxBytes` | Maximum number of bytes to send in a flow | 1000

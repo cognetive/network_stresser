@@ -1,22 +1,27 @@
-imagePullPolicy: IfNotPresent
+imagePullPolicy: Always
 serviceName: receiver
 receiverReplicas: 1
 generatorReplicas: 1
+confFile: skydive_tests/stats.conf
 imageConfig:
+  iperfPath: iperf3
   pythonPath: /usr/bin/python2.7
   generatorPath: /usr/bin/traffic_generator.py
   receiverPath: /usr/bin/traffic_receiver.py
   tcpReceiverPath: /usr/bin/traffic_receiver_tcp.py
   udpReceiverPath: /usr/bin/traffic_receiver_udp.py
 cmdOptions:
+  useIperf: True
   tcpPort: 8081
   udpPort: 8082
+  iperfBandwidth: 0
+  iperfThreads: 8
   udpPercentage: 0
   minBytes: 100
-  maxBytes: 100
+  maxBytes: 500
   udpBuffer: 1000
-  numOfFlows: 10
-  time: 2
-  delay: 1000
+  numOfFlows: 500
+  time: 5
+  delay: 10
   silent: False
   

@@ -1,3 +1,5 @@
+#!/bin/bash
+
 if [[ debug == "$1" ]]; then
   INSTRUMENTING=yes
   shift
@@ -15,7 +17,8 @@ CPU_ID=4 # Location of CPU usage value in kubectl top's output
 RAM_ID=5 # Location of RAM usage value in kubectl top's output
 
 TEST_NAME=$1
-RELEASE=network-stresser-test-${TEST_NAME}
+SPECIFIC_TEST_NAME=$(cut -d "/" -f 2 <<< ${TEST_NAME})
+RELEASE=network-stresser-test-${SPECIFIC_TEST_NAME}
 VALUES=${TEST_NAME}_test.yaml
 DEFAULT_NAMESPACE=default
 REFRESH_RATE=5s
@@ -78,8 +81,9 @@ get_value() {
 get_values() {
     runtime=$(bc <<< "$(get_value time) * 60")
     num_of_flows=$(get_value numOfFlows)
+    iperf_bw=$(get_value iperfBandwidth)
     delay=$(get_value delay)
-    builtin echo "min_runtime:${runtime}s, min_flows_per_generator:${num_of_flows}, delay:${delay}ms"
+    builtin echo "min_runtime:${runtime}s, iperf_bw:${iperf_bw}, min_flows_per_generator:${num_of_flows}, delay:${delay}ms"
 }
 
 #=== FUNCTION ==================================================================
@@ -221,6 +225,12 @@ where <test_name> matches a <test_name>_test.yaml file in the tests directory. Y
     exit
 fi
 
+# Set "CONF_FILE" to a specific file, if found at test conf file
+conf_file_name=$(get_value confFile)
+if [ -n "$conf_file_name" ]; then
+    CONF_FILE=$conf_file_name
+fi
+echo "CONF_FILE name is: ${CONF_FILE}"
 
 # Clear the cluster from previous tests
 clear_prev_tests
@@ -233,6 +243,7 @@ log "TEST_STARTING, $(get_values)"
 install_helm
 SECONDS=0
 # Wait for the test to complete
+sleep 120 # Wait for 2 minutes in order to give enough time to heapster pod to gather relevant stats
 wait_for_completion
 # Log the final statistics and receivers' output
 total_runtime=$SECONDS
@@ -242,4 +253,4 @@ save_receivers_logs
 remove_helm ${RELEASE}
 
 
-builtin echo "done"
+builtin echo -e "done\n"

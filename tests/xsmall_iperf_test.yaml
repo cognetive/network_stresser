@@ -3,7 +3,7 @@ serviceName: receiver
 receiverReplicas: 1
 generatorReplicas: 1
 imageConfig:
-  iperfPath: /usr/bin/iperf
+  iperfPath: iperf3
   pythonPath: /usr/bin/python2.7
   generatorPath: /usr/bin/traffic_generator.py
   receiverPath: /usr/bin/traffic_receiver.py
@@ -13,8 +13,8 @@ cmdOptions:
   useIperf: True
   iperfBandwidth: 100m
   iperfThreads: 1
-  tcpPort: 8080
-  udpPort: 8081
+  tcpPort: 8081
+  udpPort: 8082
   udpPercentage: 100
   minBytes: 0
   maxBytes: 0
