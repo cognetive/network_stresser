@@ -19,11 +19,11 @@ helm repo add ibm-charts https://raw.githubusercontent.com/IBM/charts/master/rep
 note 1: If you are running the stresser from a pod inside the cluster, you should allow access to k8s from that pod, in order to do that, execute:
 '''kubectl create clusterrolebinding default-admin --clusterrole cluster-admin --serviceaccount=default:default'''
 
-rem note 2: If Skydive pods (or any other) are deployed in specific namespace, need to change the configuration file '''stats.conf'''. For example
-rem   If skydive is deployed in the 'monitoring' namespace:
+note 2: To monitor additional pods (for example Skydive pods that are deployed in diffrent namespace) you can add or change the configuration file '''stats.conf'''. For example:
 
-rem - default app skydive-ibm-skydive-dev
-rem + monitoring app skydive-ibm-skydive-dev
+To monirot also skydive pods under the 'monitoring' namespace, add to the file:
+
+'''monitoring app skydive-ibm-skydive-dev'''
 
 ### Usage:
 
