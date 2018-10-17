@@ -27,3 +27,9 @@
 
 # Flag for running the script forever
 #runForever: True
+
+# tests output directoy relative path
+#analyzeTestResults: /output
+
+# Flag for Analyzing results of tests from tests output directoy  
+#analyzeTestResults: True

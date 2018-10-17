@@ -126,7 +126,52 @@ remove_helm() {
         sleep $REFRESH_RATE
         pods=$(get_pods release ${release})
     done
-    echo "removed previous test $release"
+    echo "removed previous helm relese $release"
+}
+
+#=== FUNCTION ==================================================================
+# NAME: remove_job
+# DESCRIPTION: Delete a kubernetese job
+# PARAMETER 1: The job name to remove
+#===============================================================================
+remove_job() {
+    job=$1
+    kubectl delete job $job
+    pods=$(get_pods job ${job})
+    while [ ${#pods} != 0 ]; do
+        echo "not yet: $pods still not terminated"
+        sleep $REFRESH_RATE
+        pods=$(get_pods job ${job})
+    done
+    echo "removed previous job $job"
+}
+
+#=== FUNCTION ==================================================================
+# NAME: remove_replicationcontrollers
+# DESCRIPTION: Delete a replicationcontrollers job
+# PARAMETER 1: The replicationcontrollers name to remove
+#===============================================================================
+remove_replicationcontrollers() {
+    replicationcontrollers=$1
+    kubectl delete replicationcontrollers $replicationcontrollers
+    pods=$(get_pods app ${replicationcontrollers})
+    while [ ${#pods} != 0 ]; do
+        echo "not yet: $pods still not terminated"
+        sleep $REFRESH_RATE
+        pods=$(get_pods app ${replicationcontrollers})
+    done
+    echo "removed previous replicationcontrollers $replicationcontrollers"
+}
+
+#=== FUNCTION ==================================================================
+# NAME: remove_service
+# DESCRIPTION: Delete a kubernetese service (if exists)
+# PARAMETER 1: The service to remove
+#===============================================================================
+remove_service() {
+    service=$1
+    kubectl delete service $service
+    echo "removed previous service $service, if exists"
 }
 
 #=== FUNCTION ==================================================================
@@ -140,6 +185,11 @@ clear_prev_tests() {
         echo "found previous test $prev_test"
         remove_helm $prev_test
     done
+    
+    remove_service receiver
+    remove_replicationcontrollers receiver
+    remove_job generator
+    
     echo "Done clearing previous tests"
 }
 
