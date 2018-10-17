@@ -11,13 +11,36 @@ This folder holds specific Skydive test stress code
     ````
     > apt-get install pip
     ````
-- Install bc:
+    Or:
     ````
-    > apt-get install bc
+    > apt-get install python-pip
     ````
 - Install pyyaml:
     ````
     > pip install pyyaml
+    ````
+- Install git:
+    ````
+    > apt-get install git
+    ````
+- Install curl:
+    ````
+    > apt-get install curl
+    ````
+- Install bc:
+    ````
+    > apt-get install bc
+    ````
+- Install K8S:
+    ````
+    > OS=linux
+    > ARCH=amd64
+    > TARGET_DIR=/usr/bin
+    > K8S_VERSION="v1.10.0"
+    > KUBECTL_URL="https://storage.googleapis.com/kubernetes-release/release/$K8S_VERSION/bin/$OS/$ARCH/kubectl"
+    > wget --no-check-certificate -O kubectl $KUBECTL_URL
+    > chmod a+x kubectl
+    > mv kubectl $TARGET_DIR/kubectl
     ````
 - Install and configure HELM:
     ````
@@ -30,7 +53,7 @@ This folder holds specific Skydive test stress code
 
 - Note 1: 
 If you are running the stresser from a pod inside the k8s cluster, you should allow access to k8s from that pod.
-In order to do that, execute:
+In order to do that, execute from the host side where you can enter this pod (not from the pod itself):
     ````
     > kubectl create clusterrolebinding default-admin --clusterrole cluster-admin --serviceaccount=default:default
     ````
