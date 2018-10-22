@@ -99,8 +99,6 @@ def cleaning_tests_output_directory():
     """
     logging.info("Cleaning tests output directoy \"{}\".".format(SCRIPT_PATH + TEST_OUTPUT_DIRECTORY))
     subprocess.call("rm -R -f {}".format(SCRIPT_PATH + TEST_OUTPUT_DIRECTORY), shell=True)
-    with open(CURRENT_PATH+ANALYZED_RESULTS_CSV, "wb") as resultsfile:
-        resultsfile.write(TEST_RESULTS_CSV_HEADER+"\n")                    
 
 def avarage (theList):
     intlist = [int(s) for s in theList]
@@ -156,6 +154,10 @@ if __name__ == "__main__":
     skydive_charts_config_dict["Monitor_only_host_interfaces"] = "G.V().has(\'Name\'\,NE(\'lo\')).has(\'Type\'\,\'device\')"
     skydive_charts_config_dict["not_monitoring"] = ""
     clean_existed_skydive_helm_chart()
+
+    if ANALYZE_TEST_RESULTS:
+      with open(CURRENT_PATH+ANALYZED_RESULTS_CSV, "wb") as resultsfile:
+          resultsfile.write(TEST_RESULTS_CSV_HEADER+"\n")                    
 
     while True:
         for env_variable_meaning, env_variable_value in skydive_charts_config_dict.iteritems():
