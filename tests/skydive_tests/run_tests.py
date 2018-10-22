@@ -104,6 +104,9 @@ def cleaning_tests_output_directory():
 
 def avarage (theList):
     intlist = [int(s) for s in theList]
+    if len(intlist) == 0:
+        return 0
+    
     return (sum(intlist) / len(intlist))
     
 def analyze_test_results(skydiveType,testName):
