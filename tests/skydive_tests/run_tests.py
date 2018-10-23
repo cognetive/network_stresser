@@ -5,6 +5,7 @@ import logging
 import yaml
 import mmap
 import re
+import json
 
 conf_vars = yaml.load(open('tests_conf.yaml'))
 
@@ -22,6 +23,7 @@ RUN_FOREVER = conf_vars.get('runForever', True)
 ANALYZE_TEST_RESULTS = conf_vars.get('analyzeTestResults', True)
 TEST_OUTPUT_DIRECTORY = conf_vars.get('testsOutputDirectory', "/output")
 ANALYZED_RESULTS_CSV = conf_vars.get('analyzedResultsFileName', "analyzedResults.csv")
+SKYDIVE_CHARTS_DICT =  conf_vars.get('skydiveChartsDict', """{"no-skydive": "", "not-monitoring": "", "Monitor-all-except_loopbacks": "G.V().has('Name',NE('lo'))", "Monitor-only-host_interfaces": "G.V().has('Name',NE('lo')).has('Type','device')}"}""")
 
 CURRENT_PATH = os.path.normpath(os.path.dirname(os.path.abspath(__file__))) + os.sep
 SCRIPT_PATH = CURRENT_PATH + os.pardir
@@ -88,6 +90,10 @@ def install_skydive_helm_chart(env_var_meaning, env_var_value):
     :param env_var_meaning: Meaning of the ENV variable configuration
     :param env_var_value: SkyDive chart configuration value for ENV. variable: "ENV_VARIABLE_NAME"
     """
+    if env_var_meaning == "no-skydive":
+        logging.info("Running test when skydive is not installed (not deployment of Skydive Helm: \"{}\".".format(env_var_meaning))
+        return
+    
     logging.info("Installing SkyDive helm chart, with configuration of: \"{}\".".format(env_var_meaning))
     subprocess.call("helm install {} --name={} --set env[0].name=\"{}\" --set env[0].value=\"{}\"".
                     format(SKYDIVE_HELM_CHART_PATH, SKYDIVE_HELM_CHART_NAME,
@@ -101,11 +107,30 @@ def cleaning_tests_output_directory():
     subprocess.call("rm -R -f {}".format(SCRIPT_PATH + TEST_OUTPUT_DIRECTORY), shell=True)
 
 def avarage (theList):
-    intlist = [int(s) for s in theList]
-    if len(intlist) == 0:
+    try:
+      intlist = [int(s) for s in theList]
+      if len(intlist) == 0:
+          return 0
+    except:
         return 0
     
     return (sum(intlist) / len(intlist))
+
+def maximum (value):
+    try:
+        themax = max (value)
+    except:
+        return 0
+        
+    return themax
+
+def minimum (value):
+    try:
+        themin = min (value)
+    except:
+        return 0
+        
+    return themin
     
 def analyze_test_results(skydiveType,testName):
     """
@@ -134,11 +159,11 @@ def analyze_test_results(skydiveType,testName):
     
     resultsFormatedInCSV = "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}".format(skydiveType,testName,startTime,endTime,totalTime,flows,flowsPerSecond,
                  avarage(skydiveAgentsCPUasList),avarage(skydiveAnalyzerCPUasList),avarage(receiverCPUasList),avarage(generatorCPUasList),
-                 min(skydiveAgentsCPUasList),min(skydiveAnalyzerCPUasList),min(receiverCPUasList),min(generatorCPUasList),
-                 max(skydiveAgentsCPUasList),max(skydiveAnalyzerCPUasList),max(receiverCPUasList),max(generatorCPUasList),
+                 minimum(skydiveAgentsCPUasList),minimum(skydiveAnalyzerCPUasList),minimum(receiverCPUasList),minimum(generatorCPUasList),
+                 maximum(skydiveAgentsCPUasList),maximum(skydiveAnalyzerCPUasList),maximum(receiverCPUasList),maximum(generatorCPUasList),
                  avarage(skydiveAgentsMEMasList),avarage(skydiveAnalyzerMEMasList),avarage(receiverMEMasList),avarage(generatoMEMasList),
-                 min(skydiveAgentsMEMasList),min(skydiveAnalyzerMEMasList),min(receiverMEMasList),min(generatoMEMasList),
-                 max(skydiveAgentsMEMasList),max(skydiveAnalyzerMEMasList),max(receiverMEMasList),max(generatoMEMasList)
+                 minimum(skydiveAgentsMEMasList),minimum(skydiveAnalyzerMEMasList),minimum(receiverMEMasList),minimum(generatoMEMasList),
+                 maximum(skydiveAgentsMEMasList),maximum(skydiveAnalyzerMEMasList),maximum(receiverMEMasList),maximum(generatoMEMasList)
                  )
     logging.info("------------")
     logging.info("TEST RESULTS")
@@ -149,12 +174,11 @@ def analyze_test_results(skydiveType,testName):
     
 if __name__ == "__main__":
     
-    skydive_charts_config_dict = dict()  # type: dict
-    skydive_charts_config_dict["Monitor_all_except_loopbacks"] = "G.V().has(\'Name\'\,NE(\'lo\'))"
-    skydive_charts_config_dict["Monitor_only_host_interfaces"] = "G.V().has(\'Name\'\,NE(\'lo\')).has(\'Type\'\,\'device\')"
-    skydive_charts_config_dict["not_monitoring"] = ""
-    clean_existed_skydive_helm_chart()
+    skydive_charts_config_dict = json.loads(SKYDIVE_CHARTS_DICT)
+    logging.info("Using Skydive configurations {}".format(skydive_charts_config_dict))
 
+    clean_existed_skydive_helm_chart()
+    
     if ANALYZE_TEST_RESULTS:
       with open(CURRENT_PATH+ANALYZED_RESULTS_CSV, "wb") as resultsfile:
           resultsfile.write(TEST_RESULTS_CSV_HEADER+"\n")                    

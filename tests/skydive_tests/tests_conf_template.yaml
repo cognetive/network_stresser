@@ -28,8 +28,14 @@
 # Flag for running the script forever
 #runForever: True
 
-# tests output directoy relative path
-#analyzeTestResults: /output
-
 # Flag for Analyzing results of tests from tests output directoy  
 #analyzeTestResults: True
+
+# tests output directoy relative path
+#testsOutputDirectory: /output
+
+# Analyzed results file name (.csv format)
+#analyzedResultsFileName: analyzedResults.csv
+
+# Skydive capture configurations (Dictionary)
+#skydiveChartsDict: {"no-skydive": "", "not-monitoring": "", "Monitor-all-except_loopbacks": "G.V().has('Name',NE('lo'))", "Monitor-only-host_interfaces": "G.V().has('Name',NE('lo')).has('Type','device')}"}
