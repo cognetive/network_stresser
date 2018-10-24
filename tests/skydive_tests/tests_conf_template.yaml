@@ -39,3 +39,7 @@
 
 # Skydive capture configurations (Dictionary)
 #skydiveChartsDict: {"no-skydive": "", "not-monitoring": "", "Monitor-all-except_loopbacks": "G.V().has('Name',NE('lo'))", "Monitor-only-host_interfaces": "G.V().has('Name',NE('lo')).has('Type','device')}"}
+
+# Skydive pods name (for analytics discovery of pod info from logs)
+skydiveAgentPodName: "skydive-ibm-skydive-dev-agent"
+skydiveAnalyzerPodName: "skydive-ibm-skydive-dev-analyzer"

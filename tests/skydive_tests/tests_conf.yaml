@@ -8,3 +8,5 @@ defaultNamespace: "default"
 logFileName: "web_tests.log"
 envVariableName: "SKYDIVE_ANALYZER_STARTUP_CAPTURE_GREMLIN"
 runForever: False
+skydiveAgentPodName: "skydive-ibm-skydive-dev-agent"
+skydiveAnalyzerPodName: "skydive-ibm-skydive-dev-analyzer"

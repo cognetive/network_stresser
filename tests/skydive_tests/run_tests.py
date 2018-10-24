@@ -24,6 +24,8 @@ ANALYZE_TEST_RESULTS = conf_vars.get('analyzeTestResults', True)
 TEST_OUTPUT_DIRECTORY = conf_vars.get('testsOutputDirectory', "/output")
 ANALYZED_RESULTS_CSV = conf_vars.get('analyzedResultsFileName', "analyzedResults.csv")
 SKYDIVE_CHARTS_DICT =  conf_vars.get('skydiveChartsDict', """{"no-skydive": "", "not-monitoring": "", "Monitor-all-except_loopbacks": "G.V().has('Name',NE('lo'))", "Monitor-only-host_interfaces": "G.V().has('Name',NE('lo')).has('Type','device')}"}""")
+SKYDIVE_AGENT_POD_NAME = conf_vars.get('skydiveAgentPodName',"skydive-ibm-skydive-dev-agent")
+SKYDIVE_ANALYZER_POD_NAME = conf_vars.get('skydiveAnalyzerPodName',"skydive-ibm-skydive-dev-analyzer")
 
 CURRENT_PATH = os.path.normpath(os.path.dirname(os.path.abspath(__file__))) + os.sep
 SCRIPT_PATH = CURRENT_PATH + os.pardir
@@ -147,13 +149,13 @@ def analyze_test_results(skydiveType,testName):
     flows = re.findall("flows:(.*),", stats)[0]
     flowsPerSecond = re.findall("flows_per_sec:(.*)", stats)[0]
     
-    skydiveAgentsCPUasList = re.findall("pod:skydive-ibm-skydive-dev-agent.*CPU:(.*)m", stats)
-    skydiveAnalyzerCPUasList = re.findall("pod:skydive-ibm-skydive-dev-analyzer.*CPU:(.*)m", stats)
+    skydiveAgentsCPUasList = re.findall("pod:{}.*CPU:(.*)m".format(SKYDIVE_AGENT_POD_NAME), stats)
+    skydiveAnalyzerCPUasList = re.findall("pod:{}.*CPU:(.*)m".format(SKYDIVE_ANALYZER_POD_NAME), stats)
     receiverCPUasList = re.findall("pod:receiver.*CPU:(.*)m", stats)
     generatorCPUasList = re.findall("pod:generator.*CPU:(.*)m", stats)
     
-    skydiveAgentsMEMasList = re.findall("pod:skydive-ibm-skydive-dev-agent.*RAM:(.*)Mi", stats)
-    skydiveAnalyzerMEMasList = re.findall("pod:skydive-ibm-skydive-dev-analyzer.*RAM:(.*)Mi", stats)
+    skydiveAgentsMEMasList = re.findall("pod:{}.*RAM:(.*)Mi".format(SKYDIVE_AGENT_POD_NAME), stats)
+    skydiveAnalyzerMEMasList = re.findall("pod:{}.*RAM:(.*)Mi".format(SKYDIVE_ANALYZER_POD_NAME), stats)
     receiverMEMasList = re.findall("pod:receiver.*RAM:(.*)Mi", stats)
     generatoMEMasList = re.findall("pod:generator.*RAM:(.*)Mi", stats)
     
