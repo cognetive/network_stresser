@@ -18,12 +18,13 @@ SKYDIVE_HELM_CHART_NAME = conf_vars.get('skydiveHelmChartName', "skydive")
 SKYDIVE_HELM_CHART_PATH = conf_vars.get('skydiveHelmChartPath', "ibm-charts/ibm-skydive-dev")
 DEFAULT_NAMESPACE = conf_vars.get('defaultNamespace', "default")
 LOG_FILE_NAME = conf_vars.get('logFileName', "iperf_tests.log")
-ENV_VARIABLE_NAME = conf_vars.get('envVariableName', "SKYDIVE_ANALYZER_STARTUP_CAPTURE_GREMLIN")
+CAPTURE_TYPE_VAR = conf_vars.get('skydiveCaptureTypeEnvVar', "SKYDIVE_ANALYZER_STARTUP_CAPTURE_TYPE")
+CAPTURE_GREMLIN_VAR = conf_vars.get('skydiveCaptureGremlinEnvVar', "SKYDIVE_ANALYZER_STARTUP_CAPTURE_GREMLIN")
 RUN_FOREVER = conf_vars.get('runForever', True)
 ANALYZE_TEST_RESULTS = conf_vars.get('analyzeTestResults', True)
 TEST_OUTPUT_DIRECTORY = conf_vars.get('testsOutputDirectory', "/output")
 ANALYZED_RESULTS_CSV = conf_vars.get('analyzedResultsFileName', "analyzedResults.csv")
-SKYDIVE_CHARTS_DICT =  conf_vars.get('skydiveChartsDict', """{"no-skydive": "", "not-monitoring": "", "Monitor-all-except_loopbacks": "G.V().has('Name',NE('lo'))", "Monitor-only-host_interfaces": "G.V().has('Name',NE('lo')).has('Type','device')}"}""")
+SKYDIVE_CHARTS_DICT =  conf_vars.get('skydiveChartsDict', """{"no-skydive": "", "not-monitoring": "", "ebpf": "", "Monitor-all-except_loopbacks": "G.V().has('Name'\\\\,NE('lo'))", "Monitor-only-host_interfaces": "G.V().has('Name'\\\\,NE('lo')).has('Type'\\\\,'device')}"}""")
 SKYDIVE_AGENT_POD_NAME = conf_vars.get('skydiveAgentPodName',"skydive-ibm-skydive-dev-agent")
 SKYDIVE_ANALYZER_POD_NAME = conf_vars.get('skydiveAnalyzerPodName',"skydive-ibm-skydive-dev-analyzer")
 
@@ -86,20 +87,23 @@ def clean_existed_skydive_helm_chart():
     logging.info("Successfully cleared existed SkyDive helm chart, if existed.")
 
 
-def install_skydive_helm_chart(env_var_meaning, env_var_value):
+def install_skydive_helm_chart(description, gremlin_expr):
     """
     Install SkyDive helm chart.
-    :param env_var_meaning: Meaning of the ENV variable configuration
-    :param env_var_value: SkyDive chart configuration value for ENV. variable: "ENV_VARIABLE_NAME"
+    :param description: Meaning of the configuration
+    :param gremlin_expr: SkyDive chart configuration value for gremlin exprssion.
     """
-    if env_var_meaning == "no-skydive":
-        logging.info("Running test when skydive is not installed (not deployment of Skydive Helm: \"{}\".".format(env_var_meaning))
+    captureType = "pcap"
+    if description == "no-skydive":
+        logging.info("Running test when skydive is not installed (not deployment of Skydive Helm: \"{}\".".format(description))
         return
     
-    logging.info("Installing SkyDive helm chart, with configuration of: \"{}\".".format(env_var_meaning))
-    subprocess.call("helm install {} --name={} --set env[0].name=\"{}\" --set env[0].value=\"{}\"".
-                    format(SKYDIVE_HELM_CHART_PATH, SKYDIVE_HELM_CHART_NAME,
-                           ENV_VARIABLE_NAME, env_var_value), shell=True)
+    if description == "ebpf":
+        captureType = "ebpf"
+
+    helmCommand = "helm install {} --name={} --set env[0].name=\"{}\" --set env[0].value=\"{}\" --set env[1].name=\"{}\" --set env[1].value=\"{}\" ".format(SKYDIVE_HELM_CHART_PATH, SKYDIVE_HELM_CHART_NAME, CAPTURE_GREMLIN_VAR, gremlin_expr, CAPTURE_TYPE_VAR ,captureType)
+    logging.info("Installing SkyDive \"{}\" using: {}".format(description, helmCommand))
+    subprocess.call(helmCommand, shell=True)
 
 def cleaning_tests_output_directory():
     """
@@ -186,9 +190,9 @@ if __name__ == "__main__":
           resultsfile.write(TEST_RESULTS_CSV_HEADER+"\n")                    
 
     while True:
-        for env_variable_meaning, env_variable_value in skydive_charts_config_dict.iteritems():
+        for description, gremlin_expr in skydive_charts_config_dict.iteritems():
             test_file_number = 0  # type: int
-            install_skydive_helm_chart(env_variable_meaning, env_variable_value)
+            install_skydive_helm_chart(description, gremlin_expr)
 
             # Run all test files for the current installed SkyDive chart
             for filename in sorted(os.listdir(os.path.dirname(os.path.abspath(__file__)))):
@@ -203,7 +207,7 @@ if __name__ == "__main__":
                   subprocess.call("{} {}".format(SCRIPT_PATH + SCRIPT_NAME, filename[:-10]), shell=True)
                   os.chdir(default_working_dir)
                   if ANALYZE_TEST_RESULTS:
-                    analyze_test_results(env_variable_meaning,filename[:-10])
+                    analyze_test_results(description,filename[:-10])
                   
             clean_existed_skydive_helm_chart()
         if not RUN_FOREVER:

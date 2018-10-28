@@ -22,8 +22,11 @@
 # Name of general log file
 #logFileName: "iperf_tests.log"
 
-# Environment variable name to configure as part of SkyDive helm chart installation
-#envVariableName: "SKYDIVE_ANALYZER_STARTUP_CAPTURE_GREMLIN"
+# Gremlin capture environment variable name to configure as part of SkyDive deployment
+#skydiveCaptureGremlinEnvVar: "SKYDIVE_ANALYZER_STARTUP_CAPTURE_GREMLIN"
+
+# Capture type environment variable name to configure as part of SkyDive deployment
+#skydiveCaptureTypeEnvVar: "SKYDIVE_ANALYZER_STARTUP_CAPTURE_TYPE"
 
 # Flag for running the script forever
 #runForever: True
