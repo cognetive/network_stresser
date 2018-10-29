@@ -96,11 +96,11 @@ def install_skydive_helm_chart(description, gremlin_expr):
     :param gremlin_expr: SkyDive chart configuration value for gremlin exprssion.
     """
     captureType = "pcap"
-    if description == "no-skydive":
+    if "no-skydive" in description:
         logging.info("Running test when skydive is not installed (not deployment of Skydive Helm: \"{}\".".format(description))
         return
     
-    if description == "ebpf":
+    if "ebpf" in description:
         captureType = "ebpf"
 
     helmCommand = "helm install {} --name={} --set image.repository={} --set image.tag={} --set env[0].name=\"{}\" --set env[0].value=\"{}\" --set env[1].name=\"{}\" --set env[1].value=\"{}\" ".format(SKYDIVE_HELM_CHART_PATH, SKYDIVE_HELM_CHART_NAME, SKYDIVE_IMAGE_REPOSITORY, SKYDIVE_IMAGE_TAG, CAPTURE_GREMLIN_VAR, gremlin_expr, CAPTURE_TYPE_VAR ,captureType)
