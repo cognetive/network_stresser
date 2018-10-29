@@ -24,9 +24,11 @@ RUN_FOREVER = conf_vars.get('runForever', True)
 ANALYZE_TEST_RESULTS = conf_vars.get('analyzeTestResults', True)
 TEST_OUTPUT_DIRECTORY = conf_vars.get('testsOutputDirectory', "/output")
 ANALYZED_RESULTS_CSV = conf_vars.get('analyzedResultsFileName', "analyzedResults.csv")
-SKYDIVE_CHARTS_DICT =  conf_vars.get('skydiveChartsDict', """{"no-skydive": "", "not-monitoring": "", "ebpf": "", "Monitor-all-except_loopbacks": "G.V().has('Name'\\\\,NE('lo'))", "Monitor-only-host_interfaces": "G.V().has('Name'\\\\,NE('lo')).has('Type'\\\\,'device')"}""")
+SKYDIVE_CHARTS_DICT =  conf_vars.get('skydiveChartsDict', """{"1-ebpf": "G.V().has('Name'\\\\,NE('lo')).has('Type'\\\\,'device')", "2-Monitor-only-host_interfaces": "G.V().has('Name'\\\\,NE('lo')).has('Type'\\\\,'device')", "3-no-skydive": "", "4-not-monitoring": "", "5-Monitor-all-except_loopbacks": "G.V().has('Name'\\\\,NE('lo'))"}""")
 SKYDIVE_AGENT_POD_NAME = conf_vars.get('skydiveAgentPodName',"skydive-ibm-skydive-dev-agent")
 SKYDIVE_ANALYZER_POD_NAME = conf_vars.get('skydiveAnalyzerPodName',"skydive-ibm-skydive-dev-analyzer")
+SKYDIVE_IMAGE_REPOSITORY = conf_vars.get('skydiveImageRepository',"ibmcom/skydive")
+SKYDIVE_IMAGE_TAG = conf_vars.get('skydiveImageTag',"latest")
 
 CURRENT_PATH = os.path.normpath(os.path.dirname(os.path.abspath(__file__))) + os.sep
 SCRIPT_PATH = CURRENT_PATH + os.pardir
@@ -101,7 +103,7 @@ def install_skydive_helm_chart(description, gremlin_expr):
     if description == "ebpf":
         captureType = "ebpf"
 
-    helmCommand = "helm install {} --name={} --set env[0].name=\"{}\" --set env[0].value=\"{}\" --set env[1].name=\"{}\" --set env[1].value=\"{}\" ".format(SKYDIVE_HELM_CHART_PATH, SKYDIVE_HELM_CHART_NAME, CAPTURE_GREMLIN_VAR, gremlin_expr, CAPTURE_TYPE_VAR ,captureType)
+    helmCommand = "helm install {} --name={} --set image.repository={} --set image.tag={} --set env[0].name=\"{}\" --set env[0].value=\"{}\" --set env[1].name=\"{}\" --set env[1].value=\"{}\" ".format(SKYDIVE_HELM_CHART_PATH, SKYDIVE_HELM_CHART_NAME, SKYDIVE_IMAGE_REPOSITORY, SKYDIVE_IMAGE_TAG, CAPTURE_GREMLIN_VAR, gremlin_expr, CAPTURE_TYPE_VAR ,captureType)
     logging.info("Installing SkyDive \"{}\" using: {}".format(description, helmCommand))
     subprocess.call(helmCommand, shell=True)
 
@@ -190,7 +192,7 @@ if __name__ == "__main__":
           resultsfile.write(TEST_RESULTS_CSV_HEADER+"\n")                    
 
     while True:
-        for description, gremlin_expr in skydive_charts_config_dict.iteritems():
+        for description, gremlin_expr in sorted(skydive_charts_config_dict.iteritems()):
             test_file_number = 0  # type: int
             install_skydive_helm_chart(description, gremlin_expr)
 

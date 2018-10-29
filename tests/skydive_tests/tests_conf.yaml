@@ -9,3 +9,5 @@ logFileName: "web_tests.log"
 runForever: False
 skydiveAgentPodName: "skydive-ibm-skydive-dev-agent"
 skydiveAnalyzerPodName: "skydive-ibm-skydive-dev-analyzer"
+skydiveImageRepository: "cognetive/skydive"
+skydiveImageTag: "latest"
