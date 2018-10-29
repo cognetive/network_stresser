@@ -24,7 +24,7 @@ RUN_FOREVER = conf_vars.get('runForever', True)
 ANALYZE_TEST_RESULTS = conf_vars.get('analyzeTestResults', True)
 TEST_OUTPUT_DIRECTORY = conf_vars.get('testsOutputDirectory', "/output")
 ANALYZED_RESULTS_CSV = conf_vars.get('analyzedResultsFileName', "analyzedResults.csv")
-SKYDIVE_CHARTS_DICT =  conf_vars.get('skydiveChartsDict', """{"no-skydive": "", "not-monitoring": "", "ebpf": "", "Monitor-all-except_loopbacks": "G.V().has('Name'\\\\,NE('lo'))", "Monitor-only-host_interfaces": "G.V().has('Name'\\\\,NE('lo')).has('Type'\\\\,'device')}"}""")
+SKYDIVE_CHARTS_DICT =  conf_vars.get('skydiveChartsDict', """{"no-skydive": "", "not-monitoring": "", "ebpf": "", "Monitor-all-except_loopbacks": "G.V().has('Name'\\\\,NE('lo'))", "Monitor-only-host_interfaces": "G.V().has('Name'\\\\,NE('lo')).has('Type'\\\\,'device')"}""")
 SKYDIVE_AGENT_POD_NAME = conf_vars.get('skydiveAgentPodName',"skydive-ibm-skydive-dev-agent")
 SKYDIVE_ANALYZER_POD_NAME = conf_vars.get('skydiveAnalyzerPodName',"skydive-ibm-skydive-dev-analyzer")
 
