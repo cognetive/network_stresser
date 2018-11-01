@@ -103,7 +103,7 @@ def install_skydive_helm_chart(description, gremlin_expr):
     if "ebpf" in description:
         captureType = "ebpf"
 
-    helmCommand = "helm install {} --name={} --set image.repository={} --set image.tag={} --set env[0].name=\"{}\" --set env[0].value=\"{}\" --set env[1].name=\"{}\" --set env[1].value=\"{}\" ".format(SKYDIVE_HELM_CHART_PATH, SKYDIVE_HELM_CHART_NAME, SKYDIVE_IMAGE_REPOSITORY, SKYDIVE_IMAGE_TAG, CAPTURE_GREMLIN_VAR, gremlin_expr, CAPTURE_TYPE_VAR ,captureType)
+    helmCommand = "helm install {} --name={} --set image.repository={} --set image.tag={} --set env[0].name=\"{}\" --set env[0].value=\"{}\" --set env[1].name=\"{}\" --set env[1].value=\"{}\" --set env[2].name=\"SKYDIVE_LOGGING_LEVEL\" --set env[2].value=\"ERROR\"  ".format(SKYDIVE_HELM_CHART_PATH, SKYDIVE_HELM_CHART_NAME, SKYDIVE_IMAGE_REPOSITORY, SKYDIVE_IMAGE_TAG, CAPTURE_GREMLIN_VAR, gremlin_expr, CAPTURE_TYPE_VAR ,captureType)
     logging.info("Installing SkyDive \"{}\" using: {}".format(description, helmCommand))
     subprocess.call(helmCommand, shell=True)
 
@@ -183,7 +183,7 @@ def analyze_test_results(skydiveType,testName):
 if __name__ == "__main__":
     
     skydive_charts_config_dict = json.loads(SKYDIVE_CHARTS_DICT)
-    logging.info("Using Skydive configurations {}".format(skydive_charts_config_dict))
+    logging.info("Using Skydive configurations {}".format(sorted(skydive_charts_config_dict)))
 
     clean_existed_skydive_helm_chart()
     
