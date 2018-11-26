@@ -1,0 +1,13 @@
+startStr: "web"
+endStr: "_test.yaml"
+testFileNamePrefix: "skydive_tests/"
+scriptName: "/test.sh"
+skydiveHelmChartName: "skydive"
+skydiveHelmChartPath: "ibm-charts/ibm-skydive-dev"
+defaultNamespace: "default"
+logFileName: "web_tests.log"
+runForever: False
+skydiveAgentPodName: "ibm-skydive-dev-ibm-skydive-dev-agent"
+skydiveAnalyzerPodName: "ibm-skydive-dev-ibm-skydive-dev-analyzer"
+skydiveImageRepository: "cognetive/skydive"
+skydiveImageTag: "latest"

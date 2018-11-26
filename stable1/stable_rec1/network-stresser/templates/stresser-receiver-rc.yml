@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: receiver
+spec:
+  replicas: {{ .Values.receiverReplicas }}
+  selector:
+    app: receiver
+  template:
+    metadata:
+      name: receiver
+      labels:
+        app: receiver
+        release: "{{ .Release.Name }}"
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - generator
+                  - receiver
+              topologyKey: kubernetes.io/hostname
+      containers:
+      - name: receiver
+        image: {{ .Values.imagePath }}
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        env:
+        - name: PYTHONUNBUFFERED
+          value: "0"
+        command:
+        - {{ .Values.imageConfig.pythonPath }}
+        - -u
+        - {{ .Values.imageConfig.receiverPath }}
+        - --python_bin={{ .Values.imageConfig.pythonPath }}
+        - --iperf_bin={{ .Values.imageConfig.iperfPath }}
+        - --use_iperf={{ .Values.cmdOptions.useIperf }}
+        - --tcp_receiver={{ .Values.imageConfig.tcpReceiverPath }}
+        - --udp_receiver={{ .Values.imageConfig.udpReceiverPath }}
+        - --tcp_port={{ .Values.cmdOptions.tcpPort }}
+        - --udp_port={{ .Values.cmdOptions.udpPort }}
+        - --buffer_size={{ .Values.cmdOptions.udpBuffer }}
+        - --silent={{ .Values.cmdOptions.silent }}
+        ports:
+        - name: tcp-receiver
+          protocol: TCP
+          containerPort: {{ .Values.cmdOptions.tcpPort }}
+        - name: udp-receiver
+          protocol: UDP
+          containerPort: {{ .Values.cmdOptions.udpPort }}
+          
