@@ -1,2 +1,0 @@
-2018-11-25 19:07:11.582124	TEST STARTING: max_desired_runtime=5.000m, desired_flows=100000, delay=1ms
-2018-11-25 19:12:06.695587	TEST COMPLETE: total_runtime=4.919min flows=0 flows_per_sec=0.000
