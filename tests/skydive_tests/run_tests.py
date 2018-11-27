@@ -32,7 +32,7 @@ RUN_FOREVER = conf_vars.get('runForever', True)
 ANALYZE_TEST_RESULTS = conf_vars.get('analyzeTestResults', True)
 TEST_OUTPUT_DIRECTORY = conf_vars.get('testsOutputDirectory', "/output")
 ANALYZED_RESULTS_CSV = conf_vars.get('analyzedResultsFileName', "analyzedResults.csv")
-SKYDIVE_CHARTS_DICT =  conf_vars.get('skydiveChartsDict', """{"1-no-skydive": ""}""")
+SKYDIVE_CHARTS_DICT =  conf_vars.get('skydiveChartsDict', """{"1-ebpf": "G.V().has('Name'\\\\,NE('lo')).has('Type'\\\\,'device')", "2-Monitor-only-host_interfaces": "G.V().has('Name'\\\\,NE('lo')).has('Type'\\\\,'device')", "3-no-skydive": "", "4-not-monitoring": "", "5-Monitor-all-except_loopbacks": "G.V().has('Name'\\\\,NE('lo'))"}""")
 SKYDIVE_AGENT_POD_NAME = conf_vars.get('skydiveAgentPodName',"skydive-ibm-skydive-dev-agent")
 SKYDIVE_ANALYZER_POD_NAME = conf_vars.get('skydiveAnalyzerPodName',"skydive-ibm-skydive-dev-analyzer")
 SKYDIVE_IMAGE_REPOSITORY = conf_vars.get('skydiveImageRepository',"ibmcom/skydive")
@@ -215,7 +215,7 @@ if __name__ == "__main__":
     while True:
         for description, gremlin_expr in sorted(skydive_charts_config_dict.iteritems()):
             test_file_number = 0  # type: int
-            #install_skydive_helm_chart(description, gremlin_expr)
+            install_skydive_helm_chart(description, gremlin_expr)
 
             # Run all test files for the current installed SkyDive chart
             for filename in sorted(os.listdir(os.path.dirname(os.path.abspath(__file__)))):
@@ -232,7 +232,7 @@ if __name__ == "__main__":
                   if ANALYZE_TEST_RESULTS:
                     analyze_test_results(description,filename[:-10])
                   
-            #clean_existed_skydive_helm_chart()
+            clean_existed_skydive_helm_chart()
         if not RUN_FOREVER:
           break
           
