@@ -85,7 +85,8 @@ The test mode can be ingress, wherein the receivers are started inside the local
 
 - None 3:
 To run the tests in either "egress" or "ingress" mode:
-    1 - create two new directories: "internal_export_dir" and "external_export_dir" in network_stresser's parent folder.  the two directories include scripts that provide essential data regarding each of the external and local clusters.
-    2 - each of the two directories must contain two shell scripts: get_target_ip which returns an ip of some node in the cluster and connecct_to_cluster.sh which returns the an export line.
+    1 - Create two new directories: "internal_export_dir" and "external_export_dir" in network_stresser's parent folder.  The two directories should include scripts that provide essential information regarding each of the external and local clusters.
+
+    2 - Each of the two directories must contain two shell scripts: get_target_ip which returns an ip of some node in the cluster and connecct_to_cluster.sh which returns the an export line.
  
 

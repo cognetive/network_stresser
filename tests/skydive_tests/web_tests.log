@@ -2227,3 +2227,12 @@ skydiveType,testName,testStart,testEnd,totalTime,flows,flowsPerSecond,skydiveAge
 1-no-skydive,skydive_tests/web-stress-4,27/11/2018 15:49:1543333775,27/11/2018 15:55:1543334125,349,94120,319.044,88,1240,18,58,11,1245,14,56,248,915,23,65,230,1333,15,9,44,1305,15,10,613,1383,15,9
 27/11/18 15:56:17 INFO     Cleaning tests output directoy "/home/network_stresser/tests/skydive_tests/../output".
 27/11/18 15:56:17 INFO     Starting to check test file #6: "skydive_tests/web-stress-5".
+27/11/18 16:03:36 INFO     Analyzing last test results
+27/11/18 16:03:36 INFO     ------------
+27/11/18 16:03:36 INFO     TEST RESULTS
+27/11/18 16:03:36 INFO     ------------
+27/11/18 16:03:36 INFO     
+skydiveType,testName,testStart,testEnd,totalTime,flows,flowsPerSecond,skydiveAgentsCPUAvg,skydiveAnalyzerCPUAvg,receiverCPUAvg,generatorCPUAvg,skydiveAgentsCPUMin,skydiveAnalyzerCPUmin,receiverCPUMin,generatorCPUMin,skydiveAgentsCPUMax,skydiveAnalyzerCPUmax,receiverCPUMax,generatorCPUMax,skydiveAgentsMEMAvg,skydiveAnalyzerMEMAvg,receiverMEMAvg,generatorMEMAvg,skydiveAgentsMEMMin,skydiveAnalyzerMEMmin,receiverMEMMin,generatorMEMMin,skydiveAgentsMEMMax,skydiveAnalyzerMEMmax,receiverMEMMax,generatorMEMMax
+1-no-skydive,skydive_tests/web-stress-5,27/11/2018 15:56:1543334210,27/11/2018 16:02:1543334570,359,159838,541.723,115,1754,29,95,10,1271,26,101,351,1845,39,98,261,1581,15,10,45,1454,15,10,715,1818,15,11
+27/11/18 16:03:36 INFO     Cleaning tests output directoy "/home/network_stresser/tests/skydive_tests/../output".
+27/11/18 16:03:36 INFO     Starting to check test file #7: "skydive_tests/web-stress-6".
