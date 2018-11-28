@@ -9,15 +9,15 @@ spec:
   ports:
   - name: tcp-receiver
     protocol: TCP
-    port: {{ .Values.cmdOptions.tcpPort }}
-    targetPort: {{ .Values.cmdOptions.tcpPort }}
+    port: 8081
+    targetPort: 8081
   - name: udp-receiver-tcp
     protocol: TCP
-    port: {{ .Values.cmdOptions.udpPort }}
-    targetPort: {{ .Values.cmdOptions.udpPort }}
+    port: 8082
+    targetPort: 8082
   - name: udp-receiver-udp
     protocol: UDP
-    port: {{ .Values.cmdOptions.udpPort }}
-    targetPort: {{ .Values.cmdOptions.udpPort }}
+    port: 8082
+    targetPort: 8082
   selector:
     app: receiver

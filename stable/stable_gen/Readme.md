@@ -39,7 +39,7 @@ The following table lists the configurable parameters of the chart and their def
 
 Parameter | Description | Default
 --------- | ----------- | -------
-`imagePath` | Path to the Docker image | cognetive/network_stresser:0.0.4
+`imagePath` | Path to the Docker image | cognetive/network_stresser:0.0.5
 `imagePullPolicy` | Whether to Always pull imaged or only IfNotPresent | IfNotPresent
 `serviceName` | The name of the receiver's service | receiver
 `receiverReplicas` | How many instances if the receiver to create | 1

@@ -1,8 +1,8 @@
+imagePath: "cognetive/network_stresser:0.0.5"
 imagePullPolicy: IfNotPresent
 serviceName: receiver
-receiverReplicas: 6
-generatorReplicas: 6
-confFile: skydive_tests/stats.conf
+receiverReplicas: 1
+generatorReplicas: 1
 imageConfig:
   pythonPath: /usr/bin/python2.7
   generatorPath: /usr/bin/traffic_generator.py
@@ -10,15 +10,17 @@ imageConfig:
   tcpReceiverPath: /usr/bin/traffic_receiver_tcp.py
   udpReceiverPath: /usr/bin/traffic_receiver_udp.py
 cmdOptions:
-  useIperf: False
-  tcpPort: 8081
-  udpPort: 8082
-  udpPercentage: 0
+  useIperf: True
+  iperfBandwidth: 100m
+  iperfThreads: 1
+  tcpPort: 8080
+  udpPort: 8081
+  udpPercentage: 50
   minBytes: 100
-  maxBytes: 100
-  udpBuffer: 1000
-  numOfFlows: 100000
+  maxBytes: 1000
+  udpBuffer: 2000
+  numOfFlows: 20
   time: 5
-  delay: 500
-  silent: True
+  delay: 50
+  silent: False
   

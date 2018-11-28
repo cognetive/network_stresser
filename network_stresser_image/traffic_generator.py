@@ -7,6 +7,30 @@ from time import sleep
 from utils import *
 from datetime import datetime, timedelta
 from os import system
+import multiprocessing
+
+def do_request_tcp(lst):
+    server,port,data,silent=lst
+    try:
+        conn = httplib.HTTPConnection(server, port,timeout=1)
+        conn.request("POST", "/", data)
+    except Exception, ex:
+        conn.close()
+        return 0
+    timestamp = now()
+    if not silent: print self.send_message.format(**locals())
+
+    src_port = conn.sock.getsockname()[1]
+    try:
+        r = conn.getresponse()
+        r_len = len(r.read())
+        timestamp = now()
+        if not silent: print self.receive_message.format(**locals())
+    except Exception, e:
+        conn.close()
+        return 0
+    return 1
+    conn.close()
 
 
 class trafficGenerator(object):
@@ -53,25 +77,23 @@ class trafficGenerator(object):
         @param counter: The index of the current request in the test
         @param silent: Should logging output be suppressed
         """
+        
         dots, data = self.get_data(amount)
         port = self.tcp_port
         protocol = "TCP"
+        serv=self.server
+        #lst=[[serv, port, data,silent]]*100
+        lst=[serv, port, data,silent]
+        #pool=multiprocessing.Pool(100)
+        #results=pool.map(do_request_tcp,lst)
+        sum=do_request_tcp(lst)
+        #pool.close()
+        #pool.join()   
+        #sum=0
+        #for x in results:
+        #    sum+=x 
+        return sum
 
-        conn = httplib.HTTPConnection(self.server, port)
-        conn.request("POST", "/", data)
-        timestamp = now()
-        if not silent: print self.send_message.format(**locals())
-
-        src_port = conn.sock.getsockname()[1]
-        try:
-            r = conn.getresponse()
-            r_len = len(r.read())
-            timestamp = now()
-            if not silent: print self.receive_message.format(**locals())
-        except Exception, e:
-            print "Error occurred: %s" % (e.message,)
-
-        conn.close()
 
     def request_udp(self, amount, counter, silent):
         """
@@ -134,10 +156,12 @@ def main():
                 request_func =\
                     generator.request_iperf_udp if (random.randint(1, 100) <= args.udp_percentage) else generator.request_iperf_tcp
             else:
-                flows_counter += 1
                 request_func =\
                     generator.request_udp if (random.randint(1, 100) <= args.udp_percentage) else generator.request_tcp
-            request_func(amount, flows_counter, args.silent)           
+            if args.use_iperf:
+                request_func(amount,flows_counter,args.silent)
+            else:
+                flows_counter+=request_func(amount,flows_counter,args.silent)
             sleep(args.delay/1000.0)
 
     except KeyboardInterrupt:

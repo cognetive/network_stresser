@@ -1,5 +1,17 @@
+# Test type, can be any of "internal", "egress", "ingress"
+#direction: "internal"
+
+# The tcp port on which to expose the receivers (accessible from outside the cluster) 
+#tcp_nodePort: 30001
+
+# The udp port on which to expose the receivers (accessible from outside the cluster)
+#udp_nodePort: 30002
+
+# The IP address of the external node. Can also be "manual" -- See the Readme file
+#external_ip: "manual"
+
 # Start string for test files
-#startStr: "iperf"
+#startStr: "iperf_tcp_small"
 
 # End string for test files
 #endStr: "_test.yaml"
@@ -47,8 +59,8 @@
 #skydiveImageTag: "latest"
 
 # Skydive capture configurations (Dictionary)
-#skydiveChartsDict: {"no-skydive": "", "not-monitoring": "", "Monitor-all-except_loopbacks": "G.V().has('Name',NE('lo'))", "Monitor-only-host_interfaces": "G.V().has('Name',NE('lo')).has('Type','device')}"}
+#skydiveChartsDict: {"no-skydive": "",}"}
 
 # Skydive pods name (for analytics discovery of pod info from logs)
-skydiveAgentPodName: "skydive-ibm-skydive-dev-agent"
-skydiveAnalyzerPodName: "skydive-ibm-skydive-dev-analyzer"
+#skydiveAgentPodName: "skydive-ibm-skydive-dev-agent"
+#skydiveAnalyzerPodName: "skydive-ibm-skydive-dev-analyzer"

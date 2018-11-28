@@ -1,7 +1,7 @@
 imagePullPolicy: IfNotPresent
-serviceName: receiver
-receiverReplicas: 9
-generatorReplicas: 9
+serviceName: 169.45.99.139
+receiverReplicas: 6
+generatorReplicas: 6
 confFile: skydive_tests/stats.conf
 imageConfig:
   pythonPath: /usr/bin/python2.7
@@ -11,14 +11,14 @@ imageConfig:
   udpReceiverPath: /usr/bin/traffic_receiver_udp.py
 cmdOptions:
   useIperf: False
-  tcpPort: 8081
-  udpPort: 8082
+  tcpPort: 30001
+  udpPort: 30002
   udpPercentage: 0
-  minBytes: 1
-  maxBytes: 1
+  minBytes: 100
+  maxBytes: 100
   udpBuffer: 1000
   numOfFlows: 100000
   time: 5
-  delay: 1
+  delay: 2
   silent: True
   
