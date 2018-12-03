@@ -7,6 +7,41 @@ from time import sleep
 from utils import *
 from datetime import datetime, timedelta
 from os import system
+import multiprocessing
+
+
+def do_request_tcp(server,port,data,silent):
+
+    """
+    Initiate a single TCP connection
+    @param server: IP address of the server
+    @param port: TCP port used by the server
+    @param data: data to send
+    @param silent: enable debugging
+    output: returns 0 upon failure and 1 upon success in order to add the result to the 
+    total number of successful messages	
+    r_len here is used for debugging, when silent is False, then r_len which is the length of the message is printed
+        """
+    try:
+        conn = httplib.HTTPConnection(server, port,timeout=1)
+        conn.request("POST", "/", data)
+    except Exception, ex:
+        conn.close()
+        return 0
+    timestamp = now()
+    if not silent: print self.send_message.format(**locals())
+
+    src_port = conn.sock.getsockname()[1]
+    try:
+        r = conn.getresponse()
+        r_len = len(r.read())
+        timestamp = now()
+        if not silent: print self.receive_message.format(**locals())
+    except Exception, e:
+        conn.close()
+        return 0
+    return 1
+    conn.close()
 
 
 class trafficGenerator(object):
@@ -27,7 +62,7 @@ class trafficGenerator(object):
         self.max_bytes = max_bytes
         self.send_message = "{counter} {timestamp}\t\t\t {protocol} sending  {amount:05} bytes to port {port:04}\t{dots}"
         self.send_iperf_message = "{counter} {timestamp}\t\t\t {protocol} bandwidth {iperf_bandwidth} threads {iperf_threads} to port {port:04}"
-        self.receive_message = "{counter} {timestamp}\t {r.status} {r.reason} \t received {r_len:05} bytes from port {src_port}\n"
+        self.receive_message = "{timestamp}\t {r.status} {r.reason} \t received {r_len:05} bytes from port {src_port}\n"
 
     def get_data(self, amount):
         """
@@ -53,25 +88,14 @@ class trafficGenerator(object):
         @param counter: The index of the current request in the test
         @param silent: Should logging output be suppressed
         """
+        
         dots, data = self.get_data(amount)
         port = self.tcp_port
         protocol = "TCP"
+        serv=self.server
+        sum=do_request_tcp(serv, port, data,silent)
+        return sum
 
-        conn = httplib.HTTPConnection(self.server, port)
-        conn.request("POST", "/", data)
-        timestamp = now()
-        if not silent: print self.send_message.format(**locals())
-
-        src_port = conn.sock.getsockname()[1]
-        try:
-            r = conn.getresponse()
-            r_len = len(r.read())
-            timestamp = now()
-            if not silent: print self.receive_message.format(**locals())
-        except Exception, e:
-            print "Error occurred: %s" % (e.message,)
-
-        conn.close()
 
     def request_udp(self, amount, counter, silent):
         """
@@ -134,10 +158,12 @@ def main():
                 request_func =\
                     generator.request_iperf_udp if (random.randint(1, 100) <= args.udp_percentage) else generator.request_iperf_tcp
             else:
-                flows_counter += 1
                 request_func =\
                     generator.request_udp if (random.randint(1, 100) <= args.udp_percentage) else generator.request_tcp
-            request_func(amount, flows_counter, args.silent)           
+            if args.use_iperf:
+                request_func(amount,flows_counter,args.silent)
+            else:
+                flows_counter+=request_func(amount,flows_counter,args.silent)
             sleep(args.delay/1000.0)
 
     except KeyboardInterrupt:

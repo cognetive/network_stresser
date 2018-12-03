@@ -1,5 +1,10 @@
 #!/bin/bash
 
+#usage: test.sh [debug] test_name DIRECTION
+#test_name is simply the name of the test file, or "debug to run in 
+#DIRECTION is one of "ingress", "egress" or "internal
+#debug is optional, displays debug messages
+
 if [[ debug == "$1" ]]; then
   INSTRUMENTING=yes
   shift
@@ -8,8 +13,36 @@ echo () {
   [[ "$INSTRUMENTING" ]] && builtin echo $@
 }
 
+DIRECTION="$2"
+cd ../../external_export_dir
+EXTERNAL_EXPORT=$(./connect_to_cluster.sh)
+cd ../internal_export_dir
+INTERNAL_EXPORT=$(./connect_to_cluster.sh)
+cd ../network_stresser/tests/
 
-CHART_PATH=../stable/network-stresser/
+INTERNAL_CHART_PATH=../stable/
+INGRESS_EGRESS_CHART_PATH=../stable_ingress_egress/
+
+#SRC_EXPORT is the export that grants access to the cluster on which the generators reside (i.e. the traffic source)
+#DST_EXPORT is the export that grants access to the cluster on which the receivers reside (i.e. the traffic destination)
+#When in internal mode, these export lines are left empty
+if [[ "internal" == $DIRECTION ]]; then
+    CHART_PATH_GEN=$INTERNAL_CHART_PATH/stable_gen/network-stresser
+    CHART_PATH_REC=$INTERNAL_CHART_PATH/stable_rec/network-stresser
+    SRC_EXPORT=$INTERNAL_EXPORT
+    DST_EXPORT=$INTERNAL_EXPORT
+elif [[ $DIRECTION == "egress" ]]; then
+    CHART_PATH_GEN=$INGRESS_EGRESS_CHART_PATH/stable_gen/network-stresser
+    CHART_PATH_REC=$INGRESS_EGRESS_CHART_PATH/stable_rec/network-stresser
+    DST_EXPORT=$EXTERNAL_EXPORT
+    SRC_EXPORT=$INTERNAL_EXPORT
+else
+    CHART_PATH_GEN=$INGRESS_EGRESS_CHART_PATH/stable_gen/network-stresser
+    CHART_PATH_REC=$INGRESS_EGRESS_CHART_PATH/stable_rec/network-stresser
+    SRC_EXPORT=$EXTERNAL_EXPORT
+    DST_EXPORT=$INTERNAL_EXPORT
+fi
+
 CONF_FILE=stats.conf
 OUTPUT_DIR=output
 LOGFILE=$OUTPUT_DIR/stats.log
@@ -18,7 +51,8 @@ RAM_ID=5 # Location of RAM usage value in kubectl top's output
 
 TEST_NAME=$1
 SPECIFIC_TEST_NAME=$(cut -d "/" -f 2 <<< ${TEST_NAME})
-RELEASE=network-stresser-test-${SPECIFIC_TEST_NAME}
+RELEASE_GEN=network-stresser-test-${SPECIFIC_TEST_NAME}-gen
+RELEASE_REC=network-stresser-test-${SPECIFIC_TEST_NAME}-rec
 VALUES=${TEST_NAME}_test.yaml
 DEFAULT_NAMESPACE=default
 REFRESH_RATE=5s
@@ -39,8 +73,7 @@ get_pods() {
     label_val=$2
     namespace=${3:-$DEFAULT_NAMESPACE}
     args=$4
-    
-    builtin echo $(kubectl -n ${namespace} get pod -l ${label_key}=${label_val} $args -o jsonpath="{.items[*].metadata.name}")
+    builtin echo $(kubectl get pod -l ${label_key}=${label_val} $args --all-namespaces -o jsonpath="{.items[*].metadata.name}")
 }
 
 #=== FUNCTION ==================================================================
@@ -53,7 +86,7 @@ get_pod_status() {
     # Get the status of the given pod 
     pod=$1
     namespace=${2:-$DEFAULT_NAMESPACE}
-    builtin echo $(kubectl -n ${namespace} get pods $1 -o jsonpath="{.status.phase}")
+    builtin echo $(kubectl get pod $1 -n ${namespace} -o jsonpath="{.status.phase}")
 }
 
 #=== FUNCTION ==================================================================
@@ -96,7 +129,7 @@ get_stats() {
         [[ "$namespace" =~ ^#.*$ ]] && continue
         pods=$(get_pods $label $value $namespace)
         for pod in ${pods[@]}; do
-            stats=($(kubectl -n $namespace top pod $pod))
+            stats=($(kubectl top pod $pod -n ${namespace}))
             cpu=${stats[$CPU_ID]}
             ram=${stats[$RAM_ID]}
             log "STATS, pod:$pod, CPU:$cpu, RAM:$ram"
@@ -109,7 +142,10 @@ get_stats() {
 # DESCRIPTION: Install the test helm
 #===============================================================================
 install_helm() {
-    helm install ${CHART_PATH} --name=${RELEASE} -f ${VALUES}
+    $SRC_EXPORT
+    helm install ${CHART_PATH_GEN} --name=${RELEASE_GEN} -f ${VALUES}
+    $DST_EXPORT
+    helm install ${CHART_PATH_REC} --name=${RELEASE_REC} -f ${VALUES}
 }
 
 #=== FUNCTION ==================================================================
@@ -204,11 +240,21 @@ wait_for_completion() {
     for generator in ${generators[@]}; do
         status=$(get_pod_status ${generator})
         get_stats
+        if [[ $DIRECTION == "egress" ]] || [[ $DIRECTION == "ingress" ]]; then
+            $DST_EXPORT
+            get_stats
+            $SRC_EXPORT
+        fi
         while [ "$status" != "" ] && [ "$status" != "Succeeded" ]; do
             echo "not yet: $generator is $status"
             sleep $REFRESH_RATE
             status=$(get_pod_status ${generator})
             get_stats
+            if [[ $DIRECTION != "internal" ]]; then
+                $DST_EXPORT
+                get_stats
+                $SRC_EXPORT
+            fi
         done
         save_logs $generator
     done
@@ -283,7 +329,11 @@ fi
 echo "CONF_FILE name is: ${CONF_FILE}"
 
 # Clear the cluster from previous tests
+$SRC_EXPORT
 clear_prev_tests
+$DST_EXPORT
+clear_prev_tests
+
 # Initialise the test
 mkdir -p $OUTPUT_DIR
 if [ ! -f "$LOGFILE" ]; then
@@ -294,13 +344,21 @@ install_helm
 SECONDS=0
 # Wait for the test to complete
 sleep 120 # Wait for 2 minutes in order to give enough time to heapster pod to gather relevant stats
+$SRC_EXPORT
 wait_for_completion
 # Log the final statistics and receivers' output
 total_runtime=$SECONDS
 log "TEST_COMPLETE, total_runtime=${total_runtime}s, $(gather_statistics)"
+$DST_EXPORT
 save_receivers_logs
 # Remove the test helm
-remove_helm ${RELEASE}
+$SRC_EXPORT
+remove_helm ${RELEASE_GEN}
+$DST_EXPORT
+remove_helm ${RELEASE_REC}
 
+if [[ $DIRECTION == "egress" ]]; then
+    $SRC_EXPORT
+fi
 
 builtin echo -e "done\n"

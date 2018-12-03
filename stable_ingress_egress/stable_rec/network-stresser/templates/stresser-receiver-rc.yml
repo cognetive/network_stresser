@@ -42,8 +42,8 @@ spec:
         - --use_iperf={{ .Values.cmdOptions.useIperf }}
         - --tcp_receiver={{ .Values.imageConfig.tcpReceiverPath }}
         - --udp_receiver={{ .Values.imageConfig.udpReceiverPath }}
-        - --tcp_port={{ .Values.cmdOptions.tcpPort }}
-        - --udp_port={{ .Values.cmdOptions.udpPort }}
+        - --tcp_port={{ .Values.cmdOptions.tcpHiddenPort }}
+        - --udp_port={{ .Values.cmdOptions.udpHiddenPort }}
         - --buffer_size={{ .Values.cmdOptions.udpBuffer }}
         - --silent={{ .Values.cmdOptions.silent }}
         ports:
