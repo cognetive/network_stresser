@@ -1,5 +1,5 @@
 imagePath: "cognetive/network_stresser:0.0.5"
-imagePullPolicy: IfNotPresent
+imagePullPolicy: Always
 serviceName: receiver
 receiverReplicas: 1
 generatorReplicas: 1
@@ -13,8 +13,10 @@ cmdOptions:
   useIperf: True
   iperfBandwidth: 100m
   iperfThreads: 1
-  tcpPort: 8080
-  udpPort: 8081
+  tcpHiddenPort: 8081
+  udpHiddenPort: 8082
+  tcpPort: 30001
+  udpPort: 30002
   udpPercentage: 50
   minBytes: 100
   maxBytes: 1000

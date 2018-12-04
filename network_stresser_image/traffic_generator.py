@@ -9,8 +9,21 @@ from datetime import datetime, timedelta
 from os import system
 import multiprocessing
 
-def do_request_tcp(lst):
-    server,port,data,silent=lst
+
+def do_request_tcp(server,port,data,silent):
+
+        """
+        Initiate a single TCP connection
+        @param server: IP address of the server
+        @param port: TCP port used by the server
+        @param data: data to send
+        @param silent: enable debugging
+	
+	output: returns 0 upon failure and 1 upon success in order to add the result to the 
+	total number of successful messages
+	
+	r_len here is used for debugging, when silent is False, then r_len which is the length of the message is printed
+        """
     try:
         conn = httplib.HTTPConnection(server, port,timeout=1)
         conn.request("POST", "/", data)
@@ -51,7 +64,7 @@ class trafficGenerator(object):
         self.max_bytes = max_bytes
         self.send_message = "{counter} {timestamp}\t\t\t {protocol} sending  {amount:05} bytes to port {port:04}\t{dots}"
         self.send_iperf_message = "{counter} {timestamp}\t\t\t {protocol} bandwidth {iperf_bandwidth} threads {iperf_threads} to port {port:04}"
-        self.receive_message = "{counter} {timestamp}\t {r.status} {r.reason} \t received {r_len:05} bytes from port {src_port}\n"
+        self.receive_message = "{timestamp}\t {r.status} {r.reason} \t received {r_len:05} bytes from port {src_port}\n"
 
     def get_data(self, amount):
         """
@@ -82,16 +95,7 @@ class trafficGenerator(object):
         port = self.tcp_port
         protocol = "TCP"
         serv=self.server
-        #lst=[[serv, port, data,silent]]*100
-        lst=[serv, port, data,silent]
-        #pool=multiprocessing.Pool(100)
-        #results=pool.map(do_request_tcp,lst)
-        sum=do_request_tcp(lst)
-        #pool.close()
-        #pool.join()   
-        #sum=0
-        #for x in results:
-        #    sum+=x 
+        sum=do_request_tcp(serv, port, data,silent)
         return sum
 
 

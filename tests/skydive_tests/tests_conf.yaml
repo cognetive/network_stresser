@@ -3,7 +3,7 @@ tcp_nodePort: 30001
 udp_nodePort: 30002
 tcp_port: 8081
 udp_port: 8082
-external_ip: "manual"
+external_ip: "auto"
 startStr: "web"
 endStr: "_test.yaml"
 testFileNamePrefix: "skydive_tests/"

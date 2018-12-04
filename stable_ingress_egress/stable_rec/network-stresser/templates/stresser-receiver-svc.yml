@@ -9,18 +9,18 @@ spec:
   ports:
   - name: tcp-receiver
     protocol: TCP
-    port: 8081
-    targetPort: 8081
-    nodePort: 30001
+    port: {{ .Values.cmdOptions.tcpHiddenPort }}
+    targetPort: {{ .Values.cmdOptions.tcpHiddenPort }}
+    nodePort: {{ .Values.cmdOptions.tcpPort }}
   - name: udp-receiver-tcp
     protocol: TCP
-    port: 8082
-    targetPort: 8082
-    nodePort: 30002
+    port: {{ .Values.cmdOptions.udpHiddenPort }}
+    targetPort: {{ .Values.cmdOptions.udpHiddenPort }}
+    nodePort: {{ .Values.cmdOptions.udpPort }}
   - name: udp-receiver-udp
     protocol: UDP
-    port: 8082
-    targetPort: 8082
-    nodePort: 30002
+    port: {{ .Values.cmdOptions.udpHiddenPort }}
+    targetPort: {{ .Values.cmdOptions.udpHiddenPort }}
+    nodePort: {{ .Values.cmdOptions.udpPort }}
   selector:
     app: receiver

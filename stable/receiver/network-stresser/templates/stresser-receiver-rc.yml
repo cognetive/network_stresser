@@ -42,15 +42,15 @@ spec:
         - --use_iperf={{ .Values.cmdOptions.useIperf }}
         - --tcp_receiver={{ .Values.imageConfig.tcpReceiverPath }}
         - --udp_receiver={{ .Values.imageConfig.udpReceiverPath }}
-        - --tcp_port={{ .Values.cmdOptions.tcpHiddenPort }}
-        - --udp_port={{ .Values.cmdOptions.udpHiddenPort }}
+        - --tcp_port={{ .Values.cmdOptions.tcpPort }}
+        - --udp_port={{ .Values.cmdOptions.udpPort }}
         - --buffer_size={{ .Values.cmdOptions.udpBuffer }}
         - --silent={{ .Values.cmdOptions.silent }}
         ports:
         - name: tcp-receiver
           protocol: TCP
-          containerPort: {{ .Values.cmdOptions.tcpPort }}
+          containerPort: {{ .Values.cmdOptions.tcpExternalPort }}
         - name: udp-receiver
           protocol: UDP
-          containerPort: {{ .Values.cmdOptions.udpPort }}
+          containerPort: {{ .Values.cmdOptions.udpExternalPort }}
           

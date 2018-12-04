@@ -16,7 +16,7 @@ TCP_NODEPORT = conf_vars.get('tcp_nodePort', "30001")
 UDP_NODEPORT = conf_vars.get('udp_nodePort', "30002")
 TCP_PORT = conf_vars.get('tcp_port', "8081")
 UDP_PORT = conf_vars.get('udp_port', "8082")
-EXTERNAL_IP = conf_vars.get('external_ip', "manual")
+EXTERNAL_IP = conf_vars.get('external_ip', "auto")
 
 START_STR = conf_vars.get('startStr', "iperf")
 END_STR = conf_vars.get('endStr', "_test.yaml")
@@ -192,7 +192,7 @@ if __name__ == "__main__":
 
     if DIRECTION == "internal":
         serviceName="receiver"
-    elif EXTERNAL_IP == "manual":
+    elif EXTERNAL_IP == "auto":
         if DIRECTION == "egress":
             os.chdir('../../../external_export_dir')
         else:
@@ -203,7 +203,7 @@ if __name__ == "__main__":
     else:
         serviceName=EXTERNAL_IP
     skydive_charts_config_dict = json.loads(SKYDIVE_CHARTS_DICT)
-    create_test_from_template.create_tests('templates',serviceName,TCP_NODEPORT,UDP_NODEPORT)
+    create_test_from_template.create_tests('templates',serviceName,TCP_NODEPORT,UDP_NODEPORT,TCP_PORT,UDP_PORT)
     #logging.info("Using Skydive configurations {}".format(sorted(skydive_charts_config_dict)))
 
     #clean_existed_skydive_helm_chart()

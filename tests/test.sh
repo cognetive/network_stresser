@@ -1,5 +1,18 @@
 #!/bin/bash
 
+#usage: test.sh [debug] test_name DIRECTION
+#test_name is simply the name of the test file, or "debug to run in 
+#DIRECTION is one of "ingress", "egress" or "internal
+#debug is optional, displays debug messages
+
+if [[ debug == "$1" ]]; then
+  INSTRUMENTING=yes
+  shift
+fi
+echo () {
+  [[ "$INSTRUMENTING" ]] && builtin echo $@
+}
+
 DIRECTION="$2"
 cd ../../external_export_dir
 EXTERNAL_EXPORT=$(./connect_to_cluster.sh)
@@ -7,22 +20,22 @@ cd ../internal_export_dir
 INTERNAL_EXPORT=$(./connect_to_cluster.sh)
 cd ../network_stresser/tests/
 
-INTERNAL_CHART_PATH=../stable/
-INGRESS_EGRESS_CHART_PATH=../stable_ingress_egress/
+CHART_PATH=../stable/
+
+#SRC_EXPORT is the export that grants access to the cluster on which the generators reside (i.e. the traffic source)
+#DST_EXPORT is the export that grants access to the cluster on which the receivers reside (i.e. the traffic destination)
+#When in internal mode, these export lines are left empty
+
+CHART_PATH_GENERATOR=$CHART_PATH/generator/network-stresser
+CHART_PATH_RECEIVER=$CHART_PATH/receiver/network-stresser
 
 if [[ "internal" == $DIRECTION ]]; then
-    CHART_PATH_GEN=$INTERNAL_CHART_PATH/stable_gen/network-stresser
-    CHART_PATH_REC=$INTERNAL_CHART_PATH/stable_rec/network-stresser
     SRC_EXPORT=$INTERNAL_EXPORT
     DST_EXPORT=$INTERNAL_EXPORT
 elif [[ $DIRECTION == "egress" ]]; then
-    CHART_PATH_GEN=$INGRESS_EGRESS_CHART_PATH/stable_gen/network-stresser
-    CHART_PATH_REC=$INGRESS_EGRESS_CHART_PATH/stable_rec/network-stresser
     DST_EXPORT=$EXTERNAL_EXPORT
     SRC_EXPORT=$INTERNAL_EXPORT
 else
-    CHART_PATH_GEN=$INGRESS_EGRESS_CHART_PATH/stable_gen/network-stresser
-    CHART_PATH_REC=$INGRESS_EGRESS_CHART_PATH/stable_rec/network-stresser
     SRC_EXPORT=$EXTERNAL_EXPORT
     DST_EXPORT=$INTERNAL_EXPORT
 fi
@@ -35,8 +48,8 @@ RAM_ID=5 # Location of RAM usage value in kubectl top's output
 
 TEST_NAME=$1
 SPECIFIC_TEST_NAME=$(cut -d "/" -f 2 <<< ${TEST_NAME})
-RELEASE_GEN=network-stresser-test-${SPECIFIC_TEST_NAME}-gen
-RELEASE_REC=network-stresser-test-${SPECIFIC_TEST_NAME}-rec
+RELEASE_GENERATOR=network-stresser-test-${SPECIFIC_TEST_NAME}-generator
+RELEASE_RECEIVER=network-stresser-test-${SPECIFIC_TEST_NAME}-receiver
 VALUES=${TEST_NAME}_test.yaml
 DEFAULT_NAMESPACE=default
 REFRESH_RATE=5s
@@ -70,7 +83,7 @@ get_pod_status() {
     # Get the status of the given pod 
     pod=$1
     namespace=${2:-$DEFAULT_NAMESPACE}
-    builtin echo $(kubectl get pod $1 -n $namespace -o jsonpath="{.status.phase}")
+    builtin echo $(kubectl get pod $1 -n ${namespace} -o jsonpath="{.status.phase}")
 }
 
 #=== FUNCTION ==================================================================
@@ -113,7 +126,7 @@ get_stats() {
         [[ "$namespace" =~ ^#.*$ ]] && continue
         pods=$(get_pods $label $value $namespace)
         for pod in ${pods[@]}; do
-            stats=($(kubectl top pod $pod -n $namespace))
+            stats=($(kubectl top pod $pod -n ${namespace}))
             cpu=${stats[$CPU_ID]}
             ram=${stats[$RAM_ID]}
             log "STATS, pod:$pod, CPU:$cpu, RAM:$ram"
@@ -127,9 +140,9 @@ get_stats() {
 #===============================================================================
 install_helm() {
     $SRC_EXPORT
-    helm install ${CHART_PATH_GEN} --name=${RELEASE_GEN} -f ${VALUES}
+    helm install ${CHART_PATH_GENERATOR} --name=${RELEASE_GENERATOR} -f ${VALUES}
     $DST_EXPORT
-    helm install ${CHART_PATH_REC} --name=${RELEASE_REC} -f ${VALUES}
+    helm install ${CHART_PATH_RECEIVER} --name=${RELEASE_RECEIVER} -f ${VALUES}
 }
 
 #=== FUNCTION ==================================================================
@@ -224,7 +237,7 @@ wait_for_completion() {
     for generator in ${generators[@]}; do
         status=$(get_pod_status ${generator})
         get_stats
-        if [[ $DIRECTION != "internal" ]]; then
+        if [[ $DIRECTION == "egress" ]] || [[ $DIRECTION == "ingress" ]]; then
             $DST_EXPORT
             get_stats
             $SRC_EXPORT
@@ -337,9 +350,9 @@ $DST_EXPORT
 save_receivers_logs
 # Remove the test helm
 $SRC_EXPORT
-remove_helm ${RELEASE_GEN}
+remove_helm ${RELEASE_GENERATOR}
 $DST_EXPORT
-remove_helm ${RELEASE_REC}
+remove_helm ${RELEASE_RECEIVER}
 
 if [[ $DIRECTION == "egress" ]]; then
     $SRC_EXPORT

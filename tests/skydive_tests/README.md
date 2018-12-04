@@ -82,11 +82,13 @@ To configure execution of tests, modify the file tests_conf.yaml and rerun. Full
 
 - Note 2:
 The test mode can be ingress, wherein the receivers are started inside the local cluster together with skydive and the generators reside in some external cluster; egress where the generators and skydive are inside and the receivers are in some other cluster; and finally "internal".
+	- If you know the external IP and you with to enter it so that it would be used automatically, change the valuse of the field in tests_conf.yaml and set it to that IP. Otherwise, if you'd like the test system to automatically extract this IP using the script get_target_ip.sh, set the value to "auto".
+	- Changing the above parameters suffices to generate the desired tests.
 
 - None 3:
 To run the tests in either "egress" or "ingress" mode:
     1 - Create two new directories: "internal_export_dir" and "external_export_dir" in network_stresser's parent folder.  The two directories should include scripts that provide essential information regarding each of the external and local clusters.
 
-    2 - Each of the two directories must contain two shell scripts: get_target_ip which returns an ip of some node in the cluster and connecct_to_cluster.sh which returns the an export line.
+    2 - Each of the two directories must contain two shell scripts: get_target_ip which returns an ip of some node in the cluster and connect_to_cluster.sh which returns the an export line.
  
 

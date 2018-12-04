@@ -7,8 +7,8 @@
 # The udp port on which to expose the receivers (accessible from outside the cluster)
 #udp_nodePort: 30002
 
-# The IP address of the external node. Can also be "manual" -- See the Readme file
-#external_ip: "manual"
+# The IP address of the external node. Can also be "auto" -- See the Readme file
+#external_ip: "auto"
 
 # Start string for test files
 #startStr: "iperf_tcp_small"
@@ -59,7 +59,7 @@
 #skydiveImageTag: "latest"
 
 # Skydive capture configurations (Dictionary)
-#skydiveChartsDict: {"no-skydive": "",}"}
+#skydiveChartsDict: {"no-skydive": "", "not-monitoring": "", "Monitor-all-except_loopbacks": "G.V().has('Name',NE('lo'))", "Monitor-only-host_interfaces": "G.V().has('Name',NE('lo')).has('Type','device')}"}
 
 # Skydive pods name (for analytics discovery of pod info from logs)
 #skydiveAgentPodName: "skydive-ibm-skydive-dev-agent"
