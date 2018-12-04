@@ -1,3 +1,9 @@
+direction: "egress"
+tcp_nodePort: 30001
+udp_nodePort: 30002
+tcp_port: 8081
+udp_port: 8082
+external_ip: "auto"
 startStr: "web"
 endStr: "_test.yaml"
 testFileNamePrefix: "skydive_tests/"
@@ -6,8 +12,8 @@ skydiveHelmChartName: "skydive"
 skydiveHelmChartPath: "ibm-charts/ibm-skydive-dev"
 defaultNamespace: "default"
 logFileName: "web_tests.log"
-runForever: False
-skydiveAgentPodName: "skydive-ibm-skydive-dev-agent"
-skydiveAnalyzerPodName: "skydive-ibm-skydive-dev-analyzer"
+runForever: True
+skydiveAgentPodName: "ibm-skydive-dev-ibm-skydive-dev-agent"
+skydiveAnalyzerPodName: "ibm-skydive-dev-ibm-skydive-dev-analyzer"
 skydiveImageRepository: "cognetive/skydive"
 skydiveImageTag: "latest"

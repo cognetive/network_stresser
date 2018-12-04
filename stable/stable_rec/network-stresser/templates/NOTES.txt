@@ -1,0 +1,7 @@
+Assuming x receivers and y generators were created:
+- You can view the logs of receiver number i (for i<x) by running the following:
+    export RECEIVER_NAME=$(kubectl --namespace {{ .Release.Namespace }} get po -l app=receiver -o jsonpath="{.items[i].metadata.name}")
+    kubectl --namespace default logs $RECEIVER_NAME
+- You can view the logs of generator number j (for j<y) by running the following:
+    export GENERATOR_NAME=$(kubectl --namespace {{ .Release.Namespace }} get po -l app=generator -o jsonpath="{.items[j].metadata.name}")
+    kubectl --namespace default logs $GENERATOR_NAME

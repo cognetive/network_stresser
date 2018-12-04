@@ -6,10 +6,18 @@ import yaml
 import mmap
 import re
 import json
-
+import argparse
+import create_test_from_template
 conf_vars = yaml.load(open('tests_conf.yaml'))
 
 # Global variables
+DIRECTION = conf_vars.get('direction', "internal")
+TCP_NODEPORT = conf_vars.get('tcp_nodePort', "30001")
+UDP_NODEPORT = conf_vars.get('udp_nodePort', "30002")
+TCP_PORT = conf_vars.get('tcp_port', "8081")
+UDP_PORT = conf_vars.get('udp_port', "8082")
+EXTERNAL_IP = conf_vars.get('external_ip', "auto")
+
 START_STR = conf_vars.get('startStr', "iperf")
 END_STR = conf_vars.get('endStr', "_test.yaml")
 TEST_FILE_NAME_PREFIX = conf_vars.get('testFileNamePrefix', "skydive_tests/")
@@ -181,11 +189,24 @@ def analyze_test_results(skydiveType,testName):
         resultsfile.write(resultsFormatedInCSV+"\n")
     
 if __name__ == "__main__":
-    
-    skydive_charts_config_dict = json.loads(SKYDIVE_CHARTS_DICT)
-    logging.info("Using Skydive configurations {}".format(sorted(skydive_charts_config_dict)))
 
-    clean_existed_skydive_helm_chart()
+    if DIRECTION == "internal":
+        serviceName="receiver"
+    elif EXTERNAL_IP == "auto":
+        if DIRECTION == "egress":
+            os.chdir('../../../external_export_dir')
+        else:
+            os.chdir('../../../internal_export_dir')
+        p=subprocess.Popen(['./get_target_ip.sh'],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+        serviceName, err=p.communicate()
+        os.chdir('../network_stresser/tests/skydive_tests')
+    else:
+        serviceName=EXTERNAL_IP
+    skydive_charts_config_dict = json.loads(SKYDIVE_CHARTS_DICT)
+    create_test_from_template.create_tests('templates',serviceName,TCP_NODEPORT,UDP_NODEPORT,TCP_PORT,UDP_PORT)
+    #logging.info("Using Skydive configurations {}".format(sorted(skydive_charts_config_dict)))
+
+    #clean_existed_skydive_helm_chart()
     
     if ANALYZE_TEST_RESULTS:
       with open(CURRENT_PATH+ANALYZED_RESULTS_CSV, "wb") as resultsfile:
@@ -206,7 +227,7 @@ if __name__ == "__main__":
                   logging.info("Starting to check test file #{}: \"{}\".".format(test_file_number, filename[:-10]))
                   default_working_dir = os.getcwd()  # type: str
                   os.chdir(SCRIPT_PATH)
-                  subprocess.call("{} {}".format(SCRIPT_PATH + SCRIPT_NAME, filename[:-10]), shell=True)
+                  subprocess.call("{} {} {}".format(SCRIPT_PATH + SCRIPT_NAME, filename[:-10],DIRECTION), shell=True)
                   os.chdir(default_working_dir)
                   if ANALYZE_TEST_RESULTS:
                     analyze_test_results(description,filename[:-10])

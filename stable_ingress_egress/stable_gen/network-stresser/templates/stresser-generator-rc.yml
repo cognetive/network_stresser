@@ -1,0 +1,59 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: generator
+spec:
+  parallelism: {{ .Values.generatorReplicas }}
+  template:
+    metadata:
+      name: generator
+      labels:
+        app: generator
+        worker: generator
+        release: "{{ .Release.Name }}"
+    spec:
+      restartPolicy: OnFailure
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - generator
+                  - receiver
+              topologyKey: kubernetes.io/hostname
+      containers:
+      - name: generator
+        image:  {{ .Values.imagePath }}
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        command:
+        - {{ .Values.imageConfig.pythonPath }}
+        - -u
+        - {{ .Values.imageConfig.generatorPath }}
+        - --server={{ .Values.serviceName }}
+        - --iperf_bin={{ .Values.imageConfig.iperfPath }}
+        - --use_iperf={{ .Values.cmdOptions.useIperf }}
+        - --iperf_bandwidth={{ .Values.cmdOptions.iperfBandwidth }}
+        - --iperf_threads={{ .Values.cmdOptions.iperfThreads }}
+        - --tcp_port={{ .Values.cmdOptions.tcpPort }}
+        - --udp_port={{ .Values.cmdOptions.udpPort }}
+        - --udp_percentage={{ .Values.cmdOptions.udpPercentage }}
+        - --min_bytes={{ .Values.cmdOptions.minBytes }}
+        - --max_bytes={{ .Values.cmdOptions.maxBytes }}
+        - --num_of_flows={{ .Values.cmdOptions.numOfFlows }}
+        - --time={{ .Values.cmdOptions.time }}
+        - --delay={{ .Values.cmdOptions.delay }}
+        - --silent={{ .Values.cmdOptions.silent }}
+        env:
+        - name: generatorName
+          value: "stresser-generator"
+        - name: generatorPodIP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: receiverPodIP
+          value: {{ .Values.serviceName }}

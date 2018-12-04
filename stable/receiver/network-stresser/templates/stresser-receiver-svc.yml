@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: receiver
+  labels:
+    app: receiver
+spec:
+  {{- if .Values.cmdOptions.isNodePort }}
+  type: NodePort
+  {{- else}}
+  type: ClusterIP
+  {{- end}}
+  ports:
+  - name: tcp-receiver
+    protocol: TCP
+    port: {{ .Values.cmdOptions.tcpPort }}
+    targetPort: {{ .Values.cmdOptions.tcpPort }}
+    {{- if .Values.cmdOptions.isNodePort }}
+    nodePort: {{ .Values.cmdOptions.tcpExternalPort }} 
+    {{- end}}
+  - name: udp-receiver-tcp
+    protocol: TCP
+    port: {{ .Values.cmdOptions.udpPort }}
+    targetPort: {{ .Values.cmdOptions.udpPort }}
+    {{- if .Values.cmdOptions.isNodePort }}
+    nodePort: {{ .Values.cmdOptions.udpExternalPort }}
+    {{- end}}
+  - name: udp-receiver-udp
+    protocol: UDP
+    port: {{ .Values.cmdOptions.udpPort }}
+    targetPort: {{ .Values.cmdOptions.udpPort }}
+    {{- if .Values.cmdOptions.isNodePort }}
+    nodePort: {{ .Values.cmdOptions.udpExternalPort }}
+    {{- end}}
+  selector:
+    app: receiver
