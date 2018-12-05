@@ -206,7 +206,7 @@ if __name__ == "__main__":
     create_test_from_template.create_tests('templates',serviceName,TCP_NODEPORT,UDP_NODEPORT,TCP_PORT,UDP_PORT)
     #logging.info("Using Skydive configurations {}".format(sorted(skydive_charts_config_dict)))
 
-    #clean_existed_skydive_helm_chart()
+    clean_existed_skydive_helm_chart()
     
     if ANALYZE_TEST_RESULTS:
       with open(CURRENT_PATH+ANALYZED_RESULTS_CSV, "wb") as resultsfile:
